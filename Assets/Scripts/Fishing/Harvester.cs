@@ -1,9 +1,12 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
+
 
 public class Harvester : MonoBehaviour
 {
+    [SerializeField] private TMP_Text scoreText;
     public int score = 0;
     public Transform firePoint; 
     public Transform targetPoint; // The end point where the reel glides to
@@ -29,6 +32,7 @@ public class Harvester : MonoBehaviour
         {
             StartCoroutine(ReelRoutine());
         }
+        scoreText.text = $"Score: {score}";
     }
 
     IEnumerator ReelRoutine()
