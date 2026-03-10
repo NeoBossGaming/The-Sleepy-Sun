@@ -102,6 +102,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
+  speedDeviation: 1
+  sizeDeviation: 0.1
 --- !u!70 &7515679367603206011
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -137,5 +139,5 @@ CapsuleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1.0000001, y: 2.0000002}
+  m_Size: {x: 1.14, y: 1.87}
   m_Direction: 0

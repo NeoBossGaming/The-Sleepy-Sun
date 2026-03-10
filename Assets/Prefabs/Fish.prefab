@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6237064157876077938}
   - component: {fileID: 48112888265167653}
   - component: {fileID: -4140750727395924632}
-  - component: {fileID: 7515679367603206011}
+  - component: {fileID: 7672583051622598033}
   m_Layer: 0
   m_Name: Fish
   m_TagString: Fish
@@ -102,8 +102,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 5
---- !u!70 &7515679367603206011
-CapsuleCollider2D:
+  speedDeviation: 1
+  sizeDeviation: 0.1
+--- !u!61 &7672583051622598033
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -132,10 +134,19 @@ CapsuleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1.0000001, y: 2.0000002}
-  m_Direction: 0
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 1.5577778, y: 0.61333334}
+    newSize: {x: 2.3366666, y: 0.92}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1.5577778, y: 0.61333334}
+  m_EdgeRadius: 0
