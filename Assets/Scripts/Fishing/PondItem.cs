@@ -8,7 +8,6 @@ public class PondItem: MonoBehaviour {
         speed = UnityEngine.Random.Range(speed - speedDeviation, speed + speedDeviation);
         float sizeMultiplier = UnityEngine.Random.Range(1f-sizeDeviation, 1f+sizeDeviation);
         transform.localScale = new Vector3(sizeMultiplier, sizeMultiplier, sizeMultiplier);
-        Debug.Log(transform.scale);
     }
     void Update() {
         transform.Translate(Vector3.right * speed * Time.deltaTime);
