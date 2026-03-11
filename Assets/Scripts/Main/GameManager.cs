@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -9,7 +10,7 @@ public class GameManager : MonoBehaviour
     private bool hasAllWinConditions = false;
     
     void Awake() {
-        DontDestroyOnLoad(gameObject);
+        // DontDestroyOnLoad(gameObject);
     }
     
     public void SetSilverLeaf(bool value) {
@@ -39,6 +40,11 @@ public class GameManager : MonoBehaviour
     public bool checkWinCondition()
     {
         return hasAllWinConditions;
+    }
+
+    public void LoadSceneByName(string sceneName)
+    {
+        SceneManager.LoadScene(sceneName);
     }
 
 }

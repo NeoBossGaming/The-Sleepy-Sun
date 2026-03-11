@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class SimonSaysPuzzle : MonoBehaviour
 {
+    [SerializeField] private TMP_Text scoreText;
     public List<GameObject> statues;
     public List<int> sequence;
     public int playerStep = 0;
@@ -48,6 +50,7 @@ public class SimonSaysPuzzle : MonoBehaviour
         }
 
         // 2. When done displaying, all colors reset
+        scoreText.text = $"Score: {sequence.Count}";
         ResetAllStatueColors();
         isDisplaying = false;
     }

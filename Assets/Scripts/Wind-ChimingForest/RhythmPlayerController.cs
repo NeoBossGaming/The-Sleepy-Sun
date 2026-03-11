@@ -1,8 +1,11 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using TMPro;
 
 public class RhythmPlayerController : MonoBehaviour
 {
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private float scoreSurvived;
     InputAction moveAction;
     InputAction jumpAction;
     [SerializeField] private Rigidbody2D rb;
@@ -10,7 +13,7 @@ public class RhythmPlayerController : MonoBehaviour
     [SerializeField] private float speed = 200f;
 
     [SerializeField] private LayerMask groundLayer;
-
+    private bool ded;
     [SerializeField] private TopDownJump jumpScript;
     [SerializeField] public bool isStationary = true;
     [SerializeField] public bool ableToLandMove = true;
@@ -23,6 +26,7 @@ public class RhythmPlayerController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
+        ded = false;
     }
 
     public Vector2 getMoveValue()
@@ -42,12 +46,15 @@ public class RhythmPlayerController : MonoBehaviour
                 Dead();
             }
         }
+        scoreSurvived += Time.deltaTime;
+        scoreText.text = !ded ? $"Score: {Mathf.Round(scoreSurvived)}" : "You Ded";
     }
 
     private void Dead ()
     {
         Debug.Log("You ded");
         jumpScript.isBusy = true;
+        ded = true;
         transform.SetParent(null, true);
     }
 
