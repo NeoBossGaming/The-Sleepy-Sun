@@ -62,12 +62,15 @@ public class PlayerInput : MonoBehaviour
         currentInputValues.sprint = sprintInput.IsPressed();
     }
 
-    public inputValues obtainMoveInputActions
+    /// <summary>
+    /// Retrieves all input values from the struct.
+    /// Stores all of the input values with data type bool,
+    /// except for input move and look (Vector2)
+    /// </summary>
+
+    public inputValues obtainMoveInputActions()
     {
-        get
-        {
-            return currentInputValues;
-        }
+        return currentInputValues;
     } 
 
 }
