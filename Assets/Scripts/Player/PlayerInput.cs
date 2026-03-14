@@ -28,7 +28,7 @@ public class PlayerInput : MonoBehaviour
 
     void Start()
     {
-        // Initialize All Actions
+        // Initialize all actions
         moveInput = InputSystem.actions.FindAction("Move");
         lookInput = InputSystem.actions.FindAction("Look");
         dashInput = InputSystem.actions.FindAction("Dash");
@@ -37,6 +37,7 @@ public class PlayerInput : MonoBehaviour
         nextInput = InputSystem.actions.FindAction("Next");
         sprintInput = InputSystem.actions.FindAction("Sprint");
 
+        // Enable all inputs
         moveInput.Enable();
         lookInput.Enable();
         dashInput.Enable();
@@ -45,7 +46,7 @@ public class PlayerInput : MonoBehaviour
         nextInput.Enable();
         sprintInput.Enable();
     }
-
+    
     void Update()
     {
         // Obtain Vector 2 Input Values
@@ -65,9 +66,9 @@ public class PlayerInput : MonoBehaviour
     /// <summary>
     /// Retrieves all input values from the struct.
     /// Stores all of the input values with data type bool,
-    /// except for input move and look (Vector2)
+    /// except for input move and look (Vector2).
     /// </summary>
-
+    /// <returns>Struct containing all input values.</returns>
     public inputValues obtainMoveInputActions()
     {
         return currentInputValues;
