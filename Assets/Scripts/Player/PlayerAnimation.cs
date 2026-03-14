@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(Animator))]
+
 public class PlayerAnimation : MonoBehaviour
 {
     private PlayerInput playerInputScript;
@@ -11,11 +13,14 @@ public class PlayerAnimation : MonoBehaviour
     private bool runAnimation = true;
 
     [Header("Animation Options")]
+
     [SerializeField] private bool upAnimation, downAnimation, leftAnimation, rightAnimation, idleAnimation;
 
     [SerializeField] private float updateAnimationStateFrequency = 0.5f;
 
     void Start() {
+        playerInputScript = GetComponent<PlayerInput>();
+        playerAnimator = GetComponent<Animator>();
         StartCoroutine(UpdateAnimationState());
     }
 

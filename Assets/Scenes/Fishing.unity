@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 44474104}
   - component: {fileID: 44474103}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -333,6 +333,7 @@ Transform:
   m_Children:
   - {fileID: 2064084204}
   - {fileID: 1306532496}
+  - {fileID: 1720975833}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &596849547
@@ -1343,12 +1344,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1720975832}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.03, y: -1.93, z: -0.1712178}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.03, y: 0.69000006, z: -0.1712178}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 266277786}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2064084203
 GameObject:
@@ -1498,7 +1499,7 @@ GameObject:
   - component: {fileID: 2146518761}
   - component: {fileID: 2146518762}
   m_Layer: 0
-  m_Name: Object Spawner
+  m_Name: FishingGameManager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1543,6 +1544,5 @@ SceneRoots:
   - {fileID: 266277786}
   - {fileID: 44474104}
   - {fileID: 2146518761}
-  - {fileID: 1720975833}
   - {fileID: 596849551}
   - {fileID: 1264392992}
