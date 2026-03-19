@@ -98,7 +98,7 @@ public class FishingHarvester : MonoBehaviour
     {
         foreach (FishingSwimmingItem item in itemsCaught)
         {
-            Destory(item.gameObject);
+            Destroy(item.gameObject);
         }
     }
 }
