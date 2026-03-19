@@ -51,6 +51,8 @@ public class FishingHarvester : MonoBehaviour
             yield return null;
         }
         
+        DestoryAllCapturedObjects(); // Clears all of the captured objects once the reel has return
+
         // Glide the reel up towards the start
         while (Vector3.Distance(reelObject.position, reelEndTransform.position) > 0.1f)
         {
@@ -61,6 +63,8 @@ public class FishingHarvester : MonoBehaviour
             
             yield return null;
         }
+
+        isReeling = false;
     }
 
     /// <summary>
@@ -86,5 +90,15 @@ public class FishingHarvester : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Called when the reel has reached the finishing point.
+    /// Clear and destroy's all of the captured objects.
+    /// </summary>
+    private void DestoryAllCapturedObjects()
+    {
+        foreach (FishingSwimmingItem item in itemsCaught)
+        {
+            Destory(item.gameObject);
+        }
+    }
 }
