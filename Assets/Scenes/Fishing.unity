@@ -175,8 +175,8 @@ GameObject:
   - component: {fileID: 266277786}
   - component: {fileID: 266277785}
   - component: {fileID: 266277784}
-  - component: {fileID: 266277783}
-  - component: {fileID: 266277782}
+  - component: {fileID: 266277788}
+  - component: {fileID: 266277787}
   m_Layer: 0
   m_Name: Richelle
   m_TagString: Untagged
@@ -184,58 +184,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &266277782
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 266277781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 356483377e654074eaa7a8888b0c5c2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 266277784}
-  speed: 0
-  animator: {fileID: 0}
---- !u!70 &266277783
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 266277781}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 0.5, y: 1}
-  m_Direction: 0
 --- !u!50 &266277784
 Rigidbody2D:
   serializedVersion: 5
@@ -334,8 +282,40 @@ Transform:
   - {fileID: 2064084204}
   - {fileID: 1306532496}
   - {fileID: 1720975833}
+  - {fileID: 1475606504}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &266277787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266277781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9a3f963f86910246a16512bc1d034a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  gameManager: {fileID: 2146518762}
+  playerInputScript: {fileID: 266277788}
+  reelObject: {fileID: 1306532496}
+  fishingReelingSpeed: 5
+  reelEndTransform: {fileID: 1720975833}
+  reelStartTransform: {fileID: 1475606504}
+  reelDetectionBoxSize: {x: 0.5, y: 1}
+--- !u!114 &266277788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 266277781}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ec836517b100b34ba63eb08a3ecc4ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &596849547
 GameObject:
   m_ObjectHideFlags: 0
@@ -528,7 +508,6 @@ GameObject:
   - component: {fileID: 1306532496}
   - component: {fileID: 1306532498}
   - component: {fileID: 1306532497}
-  - component: {fileID: 1306532499}
   m_Layer: 0
   m_Name: Reel
   m_TagString: Untagged
@@ -652,23 +631,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &1306532499
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1306532495}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00c1ae7ae6f9a75498463301f4228b4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  score: 0
-  firePoint: {fileID: 1306532496}
-  targetPoint: {fileID: 1720975833}
-  boxSize: {x: 1.07, y: 0.99}
-  reelSpeed: 5
 --- !u!1 &1353477320
 GameObject:
   m_ObjectHideFlags: 0
@@ -1320,6 +1282,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1442064299}
   m_CullTransparentMesh: 1
+--- !u!1 &1475606503
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1475606504}
+  m_Layer: 0
+  m_Name: Start Point Reel
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1475606504
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1475606503}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 5.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 266277786}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1720975832
 GameObject:
   m_ObjectHideFlags: 0
@@ -1529,14 +1522,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 2146518760}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9283f6ba7ced3e54782e90dfb2923e1c, type: 3}
+  m_Script: {fileID: 11500000, guid: 729df713e06a54f4bbfd3495adeece98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  items:
+  correctObjectDeltaScore: 10
+  wrongObjectDeltaScore: 50
+  spawnObjectInterval: 1
+  spawnObjectLists:
   - {fileID: 1769747531559583946, guid: 553b9171ca33b304d867142561404f43, type: 3}
   - {fileID: 1769747531559583946, guid: fa6a4d2686b270341b84f7257b2f284e, type: 3}
   - {fileID: 7228963935952745843, guid: df150607f654d5e44ba735c9fa3a5253, type: 3}
-  spawnRate: 1
+  xSpawnLocation: -10
+  ySpawnLocationMin: -1
+  ySpawnLocationMax: 3.7
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

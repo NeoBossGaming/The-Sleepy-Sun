@@ -7,7 +7,8 @@ public class FishingHarvester : MonoBehaviour
 {
     [SerializeField] private FishingGameManager gameManager;
     [SerializeField] private PlayerInput playerInputScript;
-    [SerializeField] private bool isReeling;
+    
+    private bool isReeling;
 
     [Header("Fishing Settings")]
     [SerializeField] private Transform reelObject;
@@ -16,7 +17,7 @@ public class FishingHarvester : MonoBehaviour
     [SerializeField] private Transform reelStartTransform;
     [SerializeField] private Vector2 reelDetectionBoxSize = new Vector2(0.5f, 1.0f);
 
-    private List<FishingSwimmingItem> itemsCaught;
+    private List<FishingSwimmingItem> itemsCaught = new List<FishingSwimmingItem>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -47,20 +48,16 @@ public class FishingHarvester : MonoBehaviour
             
             // Capture all available objects.
             CaptureAllCollidingFishingObject();
-            
+            CarryAllCapturedObjects();
             yield return null;
         }
         
         DestoryAllCapturedObjects(); // Clears all of the captured objects once the reel has return
 
         // Glide the reel up towards the start
-        while (Vector3.Distance(reelObject.position, reelEndTransform.position) > 0.1f)
+        while (Vector3.Distance(reelObject.position, reelStartTransform.position) > 0.1f)
         {
             reelObject.position = Vector3.MoveTowards(reelObject.position, reelStartTransform.position, fishingReelingSpeed * Time.deltaTime);
-            
-            // Capture all available objects.
-            CaptureAllCollidingFishingObject();
-            
             yield return null;
         }
 
@@ -80,13 +77,25 @@ public class FishingHarvester : MonoBehaviour
         foreach (Collider2D col in collidingObjects)
         {
             FishingSwimmingItem objectScript = col.gameObject.GetComponent<FishingSwimmingItem>();
-            if (objectScript != null)
+            if (objectScript != null && !itemsCaught.Contains(objectScript))
             {
                 if (objectScript.StopAllActions()) gameManager.capturedObject(true);
                 else gameManager.capturedObject(false);
                 itemsCaught.Add(objectScript);
             }
 
+        }
+    }
+
+    /// <summary>
+    /// Called every iteration of reeling animation
+    /// Brings all captured items along with reel.
+    /// </summary>
+    private void CarryAllCapturedObjects()
+    {
+        foreach (FishingSwimmingItem item in itemsCaught)
+        {
+            item.gameObject.transform.position = Vector3.MoveTowards(item.gameObject.transform.position, new Vector3(item.gameObject.transform.position.x, reelEndTransform.position.y, 0), fishingReelingSpeed * Time.deltaTime);
         }
     }
 
@@ -100,5 +109,7 @@ public class FishingHarvester : MonoBehaviour
         {
             Destroy(item.gameObject);
         }
+
+        itemsCaught.Clear();
     }
 }
