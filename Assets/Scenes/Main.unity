@@ -5381,8 +5381,9 @@ GameObject:
   - component: {fileID: 1626279932}
   - component: {fileID: 1626279931}
   - component: {fileID: 1626279930}
-  - component: {fileID: 1626279934}
   - component: {fileID: 1626279935}
+  - component: {fileID: 1626279937}
+  - component: {fileID: 1626279936}
   m_Layer: 0
   m_Name: Richelle
   m_TagString: Untagged
@@ -5525,21 +5526,6 @@ Transform:
   - {fileID: 519420032}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1626279934
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1626279929}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 356483377e654074eaa7a8888b0c5c2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rb: {fileID: 1626279931}
-  speed: 200
-  animator: {fileID: 1626279935}
 --- !u!95 &1626279935
 Animator:
   serializedVersion: 7
@@ -5562,6 +5548,36 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &1626279936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626279929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6df52103e6b018c41a29ddeb251341ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  upAnimation: 1
+  downAnimation: 1
+  leftAnimation: 1
+  rightAnimation: 1
+  idleAnimation: 1
+  updateAnimationStateFrequency: 0.5
+--- !u!114 &1626279937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626279929}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ec836517b100b34ba63eb08a3ecc4ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1793806887
 GameObject:
   m_ObjectHideFlags: 0
