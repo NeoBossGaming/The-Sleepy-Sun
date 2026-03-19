@@ -19,7 +19,7 @@ public class FishingSwimmingItem : MonoBehaviour
     /// Stop all moving actions, and start to follow reel.
     /// Called when the reel hit this object.
     /// </summary>
-    private void StopAllActions()
+    public bool StopAllActions()
     {
         return correctObject;
     }

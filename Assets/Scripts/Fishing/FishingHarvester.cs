@@ -16,7 +16,7 @@ public class FishingHarvester : MonoBehaviour
     [SerializeField] private Transform reelStartTransform;
     [SerializeField] private Vector2 reelDetectionBoxSize = new Vector2(0.5f, 1.0f);
 
-    private FishingSwimmingItem[] itemsCaught;
+    private List<FishingSwimmingItem> itemsCaught;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -27,7 +27,7 @@ public class FishingHarvester : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bool initiateReelAction = playerInputScript.obtainMoveInputActions().jump;
+        bool initiateReelAction = playerInputScript.obtainMoveInputActions().dash;
         if (initiateReelAction && !isReeling)
         {
             StartCoroutine(ReelRoutine());    
@@ -40,10 +40,21 @@ public class FishingHarvester : MonoBehaviour
     IEnumerator ReelRoutine()
     {
         isReeling = true;
-        // 1. GLIDE DOWN
+        // Glide the reel down towards the end.
         while (Vector3.Distance(reelObject.position, reelEndTransform.position) > 0.1f)
         {
-            reelObject.position = Vector3.MoveTowards(reelStartTransform.position, reelEndTransform.position, fishingReelingSpeed * Time.deltaTime);
+            reelObject.position = Vector3.MoveTowards(reelObject.position, reelEndTransform.position, fishingReelingSpeed * Time.deltaTime);
+            
+            // Capture all available objects.
+            CaptureAllCollidingFishingObject();
+            
+            yield return null;
+        }
+        
+        // Glide the reel up towards the start
+        while (Vector3.Distance(reelObject.position, reelEndTransform.position) > 0.1f)
+        {
+            reelObject.position = Vector3.MoveTowards(reelObject.position, reelStartTransform.position, fishingReelingSpeed * Time.deltaTime);
             
             // Capture all available objects.
             CaptureAllCollidingFishingObject();
@@ -61,17 +72,19 @@ public class FishingHarvester : MonoBehaviour
     private void CaptureAllCollidingFishingObject()
     {
         // List off all the objects the reel is colliding with
-        Collider2D[] collidingObjects = Physics2D.OverlapBoxAll(reelObject.position, boxSize, 0f);
+        Collider2D[] collidingObjects = Physics2D.OverlapBoxAll(reelObject.position, reelDetectionBoxSize, 0f);
         foreach (Collider2D col in collidingObjects)
         {
-            objectScript = col.gameobject.GetComponent<FishingSwimmingItem>();
-            if (objectScrtip != null)
+            FishingSwimmingItem objectScript = col.gameObject.GetComponent<FishingSwimmingItem>();
+            if (objectScript != null)
             {
                 if (objectScript.StopAllActions()) gameManager.capturedObject(true);
                 else gameManager.capturedObject(false);
+                itemsCaught.Add(objectScript);
             }
+
         }
     }
 
-    
+
 }
