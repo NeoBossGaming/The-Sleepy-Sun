@@ -28,7 +28,7 @@ public class SimonSaysGameManager : MonoBehaviour
     [SerializeField] private GameManager mainGameManager;
 
     // --- State ---
-    private int currentStageIndex     = 0;
+    private int currentStageIndex = 0;
     private SimonSaysStage currentStage;
 
     // -------------------------------------------------------
