@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4239182674176340461}
   - component: {fileID: 6305333476485467648}
   - component: {fileID: 6219603908959515123}
-  - component: {fileID: 4191853060513060589}
+  - component: {fileID: 5131813187978776847}
   m_Layer: 0
   m_Name: Square
   m_TagString: Untagged
@@ -135,7 +135,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &4191853060513060589
+--- !u!114 &5131813187978776847
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -144,9 +144,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 691516277617033945}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5784e5f6a093e64d962cfba1e984cac, type: 3}
+  m_Script: {fileID: 11500000, guid: abfc51488d0a5b94cbeff776f3545e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 6305333476485467648}
 --- !u!1 &1272219226648486556
 GameObject:
   m_ObjectHideFlags: 0
@@ -257,6 +258,37 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &2436469204533630472
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6582282899008751717}
+  m_Layer: 0
+  m_Name: Next Stage Spawn Point
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6582282899008751717
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2436469204533630472}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 13.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 196141046144561166}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3882833463768133435
 GameObject:
   m_ObjectHideFlags: 0
@@ -268,7 +300,7 @@ GameObject:
   - component: {fileID: 6308551415270573663}
   - component: {fileID: 3133834973753304045}
   - component: {fileID: 4587607099680445069}
-  - component: {fileID: 2182882551592054194}
+  - component: {fileID: 7891909839867962649}
   m_Layer: 0
   m_Name: Square (4)
   m_TagString: Untagged
@@ -392,7 +424,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &2182882551592054194
+--- !u!114 &7891909839867962649
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -401,9 +433,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 3882833463768133435}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5784e5f6a093e64d962cfba1e984cac, type: 3}
+  m_Script: {fileID: 11500000, guid: abfc51488d0a5b94cbeff776f3545e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 3133834973753304045}
 --- !u!1 &4171376872962309679
 GameObject:
   m_ObjectHideFlags: 0
@@ -415,7 +448,7 @@ GameObject:
   - component: {fileID: 4740333159436994345}
   - component: {fileID: 131163223860115858}
   - component: {fileID: 6654454264254975048}
-  - component: {fileID: 990118595718937041}
+  - component: {fileID: 6105196182829796261}
   m_Layer: 0
   m_Name: Square (2)
   m_TagString: Untagged
@@ -539,7 +572,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &990118595718937041
+--- !u!114 &6105196182829796261
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -548,9 +581,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 4171376872962309679}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5784e5f6a093e64d962cfba1e984cac, type: 3}
+  m_Script: {fileID: 11500000, guid: abfc51488d0a5b94cbeff776f3545e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 131163223860115858}
 --- !u!1 &6913895532280419376
 GameObject:
   m_ObjectHideFlags: 0
@@ -560,7 +594,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 196141046144561166}
-  - component: {fileID: 4782680113865949142}
+  - component: {fileID: 4755733993785987148}
   m_Layer: 0
   m_Name: Stage
   m_TagString: Untagged
@@ -587,9 +621,10 @@ Transform:
   - {fileID: 1841497528505575855}
   - {fileID: 6308551415270573663}
   - {fileID: 329593831286161422}
+  - {fileID: 6582282899008751717}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4782680113865949142
+--- !u!114 &4755733993785987148
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -598,20 +633,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 6913895532280419376}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abfc51488d0a5b94cbeff776f3545e76, type: 3}
+  m_Script: {fileID: 11500000, guid: 25a7bc52dc4eee441b2a46cd3329ec22, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sequenceLength: 5
   statues:
-  - {fileID: 691516277617033945}
-  - {fileID: 8881192887141717330}
-  - {fileID: 4171376872962309679}
-  - {fileID: 8785745142336081361}
-  - {fileID: 3882833463768133435}
-  sequence: 
-  playerStep: 0
-  isDisplaying: 0
+  - {fileID: 5131813187978776847}
+  - {fileID: 1474119118470984245}
+  - {fileID: 6105196182829796261}
+  - {fileID: 6742373741174958636}
+  - {fileID: 7891909839867962649}
+  doorAnimator: {fileID: 3824805876842327207}
+  nextStageSpawnPoint: {fileID: 6582282899008751717}
   normalColor: {r: 1, g: 1, b: 1, a: 1}
-  activeColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  activeColor: {r: 1, g: 0.85, b: 0.2, a: 1}
+  correctColor: {r: 0, g: 1, b: 0, a: 1}
+  wrongColor: {r: 0.9, g: 0.2, b: 0.2, a: 1}
+  startDelay: 1
+  displayOnDuration: 0.5
+  displayOffDuration: 0.3
 --- !u!1 &8785745142336081361
 GameObject:
   m_ObjectHideFlags: 0
@@ -623,7 +663,7 @@ GameObject:
   - component: {fileID: 1841497528505575855}
   - component: {fileID: 5318124787324119676}
   - component: {fileID: 2901388632779592160}
-  - component: {fileID: 8932814520779004658}
+  - component: {fileID: 6742373741174958636}
   m_Layer: 0
   m_Name: Square (3)
   m_TagString: Untagged
@@ -747,7 +787,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8932814520779004658
+--- !u!114 &6742373741174958636
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -756,9 +796,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8785745142336081361}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5784e5f6a093e64d962cfba1e984cac, type: 3}
+  m_Script: {fileID: 11500000, guid: abfc51488d0a5b94cbeff776f3545e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 5318124787324119676}
 --- !u!1 &8881192887141717330
 GameObject:
   m_ObjectHideFlags: 0
@@ -770,7 +811,7 @@ GameObject:
   - component: {fileID: 763947592712097097}
   - component: {fileID: 4830146540209773017}
   - component: {fileID: 4340189143872132364}
-  - component: {fileID: 8074424905437234850}
+  - component: {fileID: 1474119118470984245}
   m_Layer: 0
   m_Name: Square (1)
   m_TagString: Untagged
@@ -894,7 +935,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!114 &8074424905437234850
+--- !u!114 &1474119118470984245
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -903,6 +944,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8881192887141717330}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a5784e5f6a093e64d962cfba1e984cac, type: 3}
+  m_Script: {fileID: 11500000, guid: abfc51488d0a5b94cbeff776f3545e76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  spriteRenderer: {fileID: 4830146540209773017}

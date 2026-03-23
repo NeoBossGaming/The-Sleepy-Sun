@@ -192,7 +192,7 @@ public class SimonSaysStage : MonoBehaviour
         if (doorAnimator != null)
         {
             // Animator needs a trigger parameter named "Open"
-            doorAnimator.SetTrigger("Open");
+            doorAnimator.SetBool("StageComplete", true);
         }
         else
         {
