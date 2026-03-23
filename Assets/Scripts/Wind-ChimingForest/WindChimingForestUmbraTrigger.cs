@@ -26,7 +26,7 @@ public class WindChimingForestUmbraTrigger : MonoBehaviour
         GetComponent<Collider2D>().isTrigger = true;
 
         if (gameManager == null)
-            gameManager = FindObjectOfType<WindChimingForestGameManager>();
+            gameManager = FindFirstObjectByType<WindChimingForestGameManager>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)

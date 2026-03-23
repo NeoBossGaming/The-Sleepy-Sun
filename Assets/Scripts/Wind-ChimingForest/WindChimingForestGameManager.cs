@@ -60,10 +60,10 @@ public class WindChimingForestGameManager : MonoBehaviour
         secondsPerBeat    = 60f / bpm;
 
         if (player == null)
-            player = FindObjectOfType<WindChimingForestPlayerController>();
+            player = FindFirstObjectByType<WindChimingForestPlayerController>();
 
         if (mainGameManager == null)
-            mainGameManager = FindObjectOfType<GameManager>();
+            mainGameManager = FindFirstObjectByType<GameManager>();
     }
 
     void Update()
@@ -143,13 +143,11 @@ public class WindChimingForestGameManager : MonoBehaviour
         isProcessingDeath = true;
         onPlayerFell?.Invoke();
 
-        player.SetMovement(false);
         yield return new WaitForSeconds(1f);
 
         // Reset player position and clear the current leaf reference
         player.transform.position = respawnPoint.position;
         player.currentLeaf = null;
-        player.SetMovement(true);
 
         isProcessingDeath = false;
     }

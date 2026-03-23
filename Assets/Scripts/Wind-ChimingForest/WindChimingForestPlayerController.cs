@@ -45,7 +45,7 @@ public class WindChimingForestPlayerController : PlayerMovement
     protected override void Start()
     {
         base.Start();
-        gameManager = FindObjectOfType<WindChimingForestGameManager>();
+        gameManager = FindFirstObjectByType<WindChimingForestGameManager>();
     }
  
     protected override void Update()
@@ -68,7 +68,7 @@ public class WindChimingForestPlayerController : PlayerMovement
         DetectTargetLeaf();
  
         // Trigger arc jump on Jump input if a valid leaf is targeted
-        if (playerInput.obtainMoveInputActions().jump && targetLeaf != null)
+        if (playerInput.obtainMoveInputActions().dash && targetLeaf != null)
             StartCoroutine(ExecuteJump(targetLeaf));
     }
  
@@ -77,9 +77,7 @@ public class WindChimingForestPlayerController : PlayerMovement
     /// </summary>
     protected override void ApplyMovement()
     {
-        rb.linearVelocity = canMove
-            ? new Vector2(moveValue.x * moveSpeed, 0f)
-            : Vector2.zero;
+        return;
     }
  
     /// <summary>
@@ -118,7 +116,6 @@ public class WindChimingForestPlayerController : PlayerMovement
     {
         isJumping  = true;
         currentLeaf = null;
-        SetMovement(false);
  
         // Switch to Kinematic for manual position control during the leap
         RigidbodyType2D originalBodyType = rb.bodyType;
@@ -162,7 +159,6 @@ public class WindChimingForestPlayerController : PlayerMovement
  
         rb.bodyType = originalBodyType;
         currentLeaf = target;
-        SetMovement(true);
         isJumping = false;
     }
  

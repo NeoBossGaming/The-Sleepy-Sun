@@ -186,7 +186,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -247,7 +248,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4193,7 +4195,7 @@ GameObject:
   - component: {fileID: 271357361}
   - component: {fileID: 271357366}
   - component: {fileID: 271357365}
-  - component: {fileID: 271357364}
+  - component: {fileID: 271357367}
   m_Layer: 0
   m_Name: Richelle
   m_TagString: Player
@@ -4292,35 +4294,13 @@ Transform:
   m_GameObject: {fileID: 271357358}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.33213216, y: -0.85012704, z: -0.048555814}
+  m_LocalPosition: {x: -1.09, y: 0.59, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1861084684}
-  m_Father: {fileID: 904149555}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &271357364
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 271357358}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f176e637912315645b8020f95d7408b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  jumpDuration: 0.5
-  jumpHeightMax: 2
-  leafDetectionRange: 2
-  leafTag: Leaf
-  playerController: {fileID: 271357365}
-  targetedLeafAnchor: {fileID: 0}
-  currentLeafAnchor: {fileID: 1765171979}
-  leafYOffset: 1
-  characterSprite: {fileID: 271357362}
-  isBusy: 0
 --- !u!114 &271357365
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4333,14 +4313,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 196131d557e89a748920f672ef5ebbc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rb: {fileID: 271357361}
   speed: 200
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  jumpScript: {fileID: 271357364}
-  isStationary: 1
-  ableToLandMove: 0
+  canMove: 1
+  jumpDuration: 0.6
+  jumpHeightMax: 1.5
+  leafYOffset: 0
+  leafDetectionRange: 2
+  leafTag: Leaf
+  characterSprite: {fileID: 271357362}
+  currentLeaf: {fileID: 1339238838}
 --- !u!61 &271357366
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4387,6 +4368,18 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1.0195956}
   m_EdgeRadius: 0
+--- !u!114 &271357367
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 271357358}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ec836517b100b34ba63eb08a3ecc4ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &403373589 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 865247729684977822, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
@@ -4504,7 +4497,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4565,7 +4559,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4626,7 +4621,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4643,7 +4639,7 @@ GameObject:
   - component: {fileID: 904149553}
   - component: {fileID: 904149556}
   m_Layer: 0
-  m_Name: Leaf Manager Controller
+  m_Name: Game Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4765,7 +4761,6 @@ Transform:
   - {fileID: 1606020403}
   - {fileID: 1823090953}
   - {fileID: 403373594}
-  - {fileID: 271357363}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &904149556
@@ -4780,7 +4775,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1fb967fdb3ec419459133ea2f1f8622f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  leafPrefab: {fileID: 6101503399418994689, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
   allLeaves:
   - {fileID: 2048068107}
   - {fileID: 15117373}
@@ -4789,8 +4783,25 @@ MonoBehaviour:
   - {fileID: 1719898505}
   - {fileID: 403373589}
   bpm: 120
-  riseSpeed: 1
-  difficulty: 2
+  cycleBeats: 4
+  baseDifficulty: 2
+  umbraExtraDifficulty: 3
+  umbraInterferenceDuration: 10
+  onUmbraInterference:
+    m_PersistentCalls:
+      m_Calls: []
+  onUmbraInterferenceEnd:
+    m_PersistentCalls:
+      m_Calls: []
+  player: {fileID: 271357365}
+  respawnPoint: {fileID: 0}
+  mainGameManager: {fileID: 0}
+  onPlayerFell:
+    m_PersistentCalls:
+      m_Calls: []
+  onPlayerWin:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &1019211920 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6950020487130594953, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
@@ -4863,7 +4874,8 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -4882,17 +4894,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ef90e46df71e45e4db7849ad7dde866c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1765171979 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5036191368889613912, guid: 5ad9d89d39a916d4dbff5e17e890c77a, type: 3}
-  m_PrefabInstance: {fileID: 86997790}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcc227fcb5805f341951031acb79e6f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!4 &1765171983 stripped
@@ -5064,3 +5065,4 @@ SceneRoots:
   m_Roots:
   - {fileID: 553469571}
   - {fileID: 904149555}
+  - {fileID: 271357363}
