@@ -41,6 +41,10 @@ public class SimonSaysStage : MonoBehaviour
     [SerializeField] private float displayOnDuration  = 0.5f; // how long each statue lights up
     [SerializeField] private float displayOffDuration = 0.3f; // gap between each statue
 
+    [Header("Start Trigger")]
+    [Tooltip("Assign a child GameObject with a 2D trigger Collider. When the player enters it, the stage sequence begins.")]
+    [SerializeField] private Collider2D stageTriggerZone;
+
     // --- State ---
     private List<int> sequence = new List<int>();
     private int playerStep     = 0;
@@ -82,6 +86,21 @@ public class SimonSaysStage : MonoBehaviour
     // Stage Flow
     // -------------------------------------------------------
 
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag("Player")) return;
+        if (hasStarted || isCompleted) return;
+
+        StartCoroutine(DelayedStart());
+    }
+
+    private IEnumerator DelayedStart()
+    {
+        // startDelay is your existing serialized field — reused here.
+        yield return new WaitForSeconds(startDelay);
+        StartStage();
+    }
+
     /// <summary>
     /// Displays the sequence to the player. Safe to call multiple times — only runs once.
     /// Called by SimonSaysGameManager after a short delay.
@@ -98,8 +117,6 @@ public class SimonSaysStage : MonoBehaviour
         isDisplaying = true;
         playerStep = 0;
         ResetAllColors();
-
-        yield return new WaitForSeconds(startDelay);
 
         foreach (int index in sequence)
         {

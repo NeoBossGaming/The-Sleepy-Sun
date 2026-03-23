@@ -21,8 +21,6 @@ public class SimonSaysGameManager : MonoBehaviour
     [SerializeField] private int        totalStages = 5;
 
     [Header("Timing")]
-    [Tooltip("Delay (seconds) after spawning before the stage starts its display.")]
-    [SerializeField] private float delayBeforeStageStart   = 0.8f;
     [Tooltip("Delay (seconds) after a stage is cleared before the next one spawns.")]
     [SerializeField] private float delayBeforeNextStageSpawn = 1.5f;
 
@@ -49,14 +47,6 @@ public class SimonSaysGameManager : MonoBehaviour
         GameObject obj = Instantiate(stagePrefab, position, Quaternion.identity);
         currentStage = obj.GetComponent<SimonSaysStage>();
         currentStage.Initialize(this);
-
-        StartCoroutine(DelayedStartStage(currentStage));
-    }
-
-    private IEnumerator DelayedStartStage(SimonSaysStage stage)
-    {
-        yield return new WaitForSeconds(delayBeforeStageStart);
-        stage.StartStage();
     }
 
     /// <summary>
