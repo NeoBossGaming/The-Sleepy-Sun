@@ -4,8 +4,8 @@ public class FishingGameManager : MonoBehaviour
 {
 
     [Header("Game Settings")]
-    [SerializeField] private int correctObjectDeltaScore; // amount of increased score when capture correct object
-    [SerializeField] private int wrongObjectDeltaScore; // amount of decreased score when capture incorrect object
+    [SerializeField] private int correctObjectDeltaScore = 1; // amount of increased score when capture correct object
+    [SerializeField] private int wrongObjectDeltaScore = 5; // amount of decreased score when capture incorrect object
 
     [SerializeField] private float spawnObjectInterval; // interval time between spawning objects
 
@@ -42,8 +42,16 @@ public class FishingGameManager : MonoBehaviour
     /// </summary>
     public void capturedObject(bool correctObject)
     {
-        if (correctObject) score += correctObjectDeltaScore;
-        else score -= wrongObjectDeltaScore;
+        if (correctObject)
+        {
+            score += correctObjectDeltaScore;
+        }
+        else
+        {
+            score = Mathf.Max(0, score - wrongObjectDeltaScore);
+        }
+        
+        Debug.Log("Score: " + score);
     }
 
 }
