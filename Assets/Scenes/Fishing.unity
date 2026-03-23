@@ -1525,8 +1525,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 729df713e06a54f4bbfd3495adeece98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  correctObjectDeltaScore: 5
-  wrongObjectDeltaScore: 1
+  correctObjectDeltaScore: 1
+  wrongObjectDeltaScore: 5
   spawnObjectInterval: 1
   spawnObjectLists:
   - {fileID: 1769747531559583946, guid: 553b9171ca33b304d867142561404f43, type: 3}
