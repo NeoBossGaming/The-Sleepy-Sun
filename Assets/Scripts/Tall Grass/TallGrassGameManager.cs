@@ -35,10 +35,10 @@ public class TallGrassGameManager : MonoBehaviour
     void Start()
     {
         if (player == null)
-            player = FindObjectOfType<TallGrassPlayerController>();
+            player = FindFirstObjectByType<TallGrassPlayerController>();
 
         if (mainGameManager == null)
-            mainGameManager = FindObjectOfType<GameManager>();
+            mainGameManager = FindFirstObjectByType<GameManager>();
     }
 
     /// <summary>
@@ -69,11 +69,9 @@ public class TallGrassGameManager : MonoBehaviour
         isProcessingDeath = true;
         onPlayerCaught?.Invoke();
 
-        player.SetMovement(false);
         yield return new WaitForSeconds(respawnDelay);
 
         player.transform.position = spawnPoint.position;
-        player.SetMovement(true);
 
         isProcessingDeath = false;
     }

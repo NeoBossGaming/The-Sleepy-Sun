@@ -29,7 +29,7 @@ public class TallGrassFlyingBird : MonoBehaviour
     {
         GetComponent<Collider2D>().isTrigger = true;
 
-        gameManager = FindObjectOfType<TallGrassGameManager>();
+        gameManager = FindFirstObjectByType<TallGrassGameManager>();
         if (gameManager == null)
             Debug.LogWarning("[TallGrassFlyingBird] No TallGrassGameManager found in scene.");
     }

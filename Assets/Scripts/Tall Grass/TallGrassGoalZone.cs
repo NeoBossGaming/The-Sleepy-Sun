@@ -19,7 +19,7 @@ public class TallGrassGoalZone : MonoBehaviour
         GetComponent<Collider2D>().isTrigger = true;
 
         if (gameManager == null)
-            gameManager = FindObjectOfType<TallGrassGameManager>();
+            gameManager = FindFirstObjectByType<TallGrassGameManager>();
     }
 
     private void OnTriggerEnter2D(Collider2D other)

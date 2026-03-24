@@ -124,7 +124,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8600013447802580523, guid: 07590cf693ec1b24faa44d7058274807, type: 3}
   m_PrefabInstance: {fileID: 5851704883376859792}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &153071350
+--- !u!114 &153071354
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -133,15 +133,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 153071346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6af204b1fe39b2f48bb5567ae0f2b796, type: 3}
+  m_Script: {fileID: 11500000, guid: 9fabc7da3b0dd534eaf65c72f8b7a5fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  waypoints:
-  - {fileID: 219869911}
-  - {fileID: 1603714985}
-  - {fileID: 1914353408}
-  - {fileID: 1499311214}
-  speed: 9
+  player: {fileID: 221915517}
+  spawnPoint: {fileID: 0}
+  mainGameManager: {fileID: 0}
+  respawnDelay: 1
+  onPlayerCaught:
+    m_PersistentCalls:
+      m_Calls: []
+  onPlayerWin:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &210469154
 GameObject:
   m_ObjectHideFlags: 0
@@ -231,6 +235,7 @@ GameObject:
   - component: {fileID: 221915514}
   - component: {fileID: 221915513}
   - component: {fileID: 221915517}
+  - component: {fileID: 221915518}
   m_Layer: 0
   m_Name: Richelle
   m_TagString: Player
@@ -382,12 +387,25 @@ MonoBehaviour:
   m_GameObject: {fileID: 221915511}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 967cf3d8eee448f4a8f4b71b003aee54, type: 3}
+  m_Script: {fileID: 11500000, guid: 992df5b7365949743b946acbc05d90b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isHidden: 0
-  rb: {fileID: 221915514}
   speed: 200
+  canMove: 1
+  hiddenAlpha: 0.5
+  isHidden: 0
+--- !u!114 &221915518
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 221915511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ec836517b100b34ba63eb08a3ecc4ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &609015433
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2020,7 +2038,7 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8600013447802580523, guid: 07590cf693ec1b24faa44d7058274807, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 153071350}
+      addedObject: {fileID: 153071354}
   m_SourcePrefab: {fileID: 100100000, guid: 07590cf693ec1b24faa44d7058274807, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
