@@ -1,110 +1,127 @@
 using UnityEngine;
+using System.Collections;
 
-/// <summary>
-/// Player controller for the Wind-Chiming Forest trial.
-/// Extends PlayerMovement — only overrides HandleInput and ApplyMovement.
-///
-/// Movement model:
-///   - The player constantly scrolls upward at scrollSpeed (matching the leaves).
-///   - Dash + a horizontal direction (left/right WASD) sidesteps to the adjacent lane.
-///   - The player snaps smoothly to the lane's X position.
-///   - No left/right freeform movement — all lateral movement is lane-based via Dash.
-///
-/// Inspector Setup:
-///   - Attach to the Player root alongside PlayerInput and Rigidbody2D (already required by base).
-///   - Rigidbody2D: Gravity Scale = 0, Freeze Rotation Z, Body Type = Dynamic.
-///   - Add a small Collider2D (e.g. CircleCollider2D, NOT a trigger) for physics,
-///     and a second small Collider2D set to Is Trigger = true for leaf detection.
-///     OR: Use one trigger Collider2D — the leaf detection uses triggers anyway.
-///   - Tag the Player "Player".
-///   - Lane X Positions: match the values you use in WindChimingForestGameManager.
-///   - Scroll Speed: must match WindChimingForestGameManager's scrollSpeed exactly.
-///   - The base class 'speed' field is unused here — you can leave it at its default.
-/// </summary>
 public class WindChimingForestPlayerController : PlayerMovement
 {
-    [Header("Lane Settings")]
-    [SerializeField] private float[] laneXPositions = { -2f, 0f, 2f };
-    [SerializeField] private int startLaneIndex = 1; // 0 = left, 1 = middle, 2 = right
-    [SerializeField] private float laneSnapSpeed = 15f; // How fast player lerps to lane X
+    [Header("Dash Settings")]
+    [SerializeField] private float dashDuration = 0.18f;
+    [SerializeField] private float detectionDistance = 3f;
+    [SerializeField] private Vector2 detectionBoxSize = new Vector2(0.4f, 0.8f);
 
-    [Header("Dash")]
-    [SerializeField] private float dashCooldown = 0.35f; // Minimum time between lane switches
+    private WindChimingForestLeaf currentLeaf;
+    private int dashDirection = 1;
+    private bool isDashing = false;
 
-    [Header("Scroll")]
-    [Tooltip("Must match the scrollSpeed in WindChimingForestGameManager.")]
-    [SerializeField] public float scrollSpeed = 2f;
+    public WindChimingForestLeaf CurrentLeaf => currentLeaf;
 
-    public int CurrentLaneIndex { get; private set; }
-    private float dashTimer = 0f;
-
-    protected override void Start()
+    public void SetCurrentLeaf(WindChimingForestLeaf leaf)
     {
-        base.Start();
-        CurrentLaneIndex = startLaneIndex;
+        if (currentLeaf != null) currentLeaf.SetHasPlayer(false);
+        currentLeaf = leaf;
 
-        // Immediately snap to starting lane — no lerp at spawn
-        Vector3 pos = transform.position;
-        pos.x = laneXPositions[CurrentLaneIndex];
-        transform.position = pos;
+        if (currentLeaf != null)
+        {
+            currentLeaf.SetHasPlayer(true);
+            transform.position = currentLeaf.transform.position;
+        }
     }
 
-    /// <summary>
-    /// Checks for Dash input and switches lanes if a valid horizontal direction is held.
-    /// Called every Update by the base class — button presses are safe here.
-    /// </summary>
     protected override void HandleInput()
     {
-        dashTimer -= Time.deltaTime;
-        if (!canMove || dashTimer > 0f) return;
+        if (!canMove || isDashing) return;
 
-        if (!playerInput.obtainMoveInputActions().dash) return;
+        if (moveValue.x < -0.3f) dashDirection = -1;
+        else if (moveValue.x > 0.3f) dashDirection = 1;
 
-        // Use the move vector's X axis to determine which direction to dash
-        float horizontal = moveValue.x;
-
-        if (horizontal > 0.1f)
-            TryChangeLane(CurrentLaneIndex + 1);
-        else if (horizontal < -0.1f)
-            TryChangeLane(CurrentLaneIndex - 1);
-    }
-
-    private void TryChangeLane(int targetIndex)
-    {
-        if (targetIndex < 0 || targetIndex >= laneXPositions.Length) return;
-        CurrentLaneIndex = targetIndex;
-        dashTimer = dashCooldown;
-    }
-
-    /// <summary>
-    /// Replaces base ApplyMovement entirely:
-    ///   X: smooth lerp toward current lane's X position.
-    ///   Y: constant upward scroll (matches leaf scroll speed).
-    /// </summary>
-    protected override void ApplyMovement()
-    {
-        if (!canMove)
+        if (playerInput.obtainMoveInputActions().dash)
         {
-            rb.linearVelocity = Vector2.zero;
-            return;
+            TryDash();
+        }
+    }
+
+    // Switched to a standard Update logic or called manually to sync with scroll
+    void LateUpdate()
+    {
+        if (!canMove) return;
+
+        rb.linearVelocity = Vector2.zero;
+
+        if (!isDashing && currentLeaf != null && currentLeaf.IsActive)
+        {
+            transform.position = currentLeaf.transform.position;
+        }
+    }
+
+    protected override void ApplyMovement() 
+    {
+        // Left empty because we are using LateUpdate for scroll-syncing
+    }
+
+    private void TryDash()
+    {
+        WindChimingForestLeaf target = DetectLeafInDirection(dashDirection);
+        if (target == null) return;
+
+        StartCoroutine(DashRoutine(target));
+    }
+
+    private WindChimingForestLeaf DetectLeafInDirection(int direction)
+    {
+        Vector2 boxCenter = (Vector2)transform.position + Vector2.right * direction * detectionDistance;
+        Collider2D[] hits = Physics2D.OverlapBoxAll(boxCenter, detectionBoxSize, 0f);
+
+        WindChimingForestLeaf closest = null;
+        float closestDist = float.MaxValue;
+
+        foreach (Collider2D hit in hits)
+        {
+            WindChimingForestLeaf leaf = hit.GetComponent<WindChimingForestLeaf>();
+            if (leaf == null || !leaf.IsActive) continue;
+
+            float dist = Mathf.Abs(hit.transform.position.x - transform.position.x);
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = leaf;
+            }
+        }
+        return closest;
+    }
+
+    private IEnumerator DashRoutine(WindChimingForestLeaf targetLeaf)
+    {
+        isDashing = true;
+        if (currentLeaf != null) currentLeaf.SetHasPlayer(false);
+        currentLeaf = null;
+
+        float startX = transform.position.x;
+        float elapsed = 0f;
+
+        while (elapsed < dashDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / dashDuration);
+
+            // Sync with target leaf's current world position
+            transform.position = new Vector3(
+                Mathf.Lerp(startX, targetLeaf.transform.position.x, t),
+                targetLeaf.transform.position.y,
+                transform.position.z
+            );
+
+            yield return null;
         }
 
-        float targetX = laneXPositions[CurrentLaneIndex];
-        float newX    = Mathf.Lerp(transform.position.x, targetX, laneSnapSpeed * Time.fixedDeltaTime);
-        float xVel    = (newX - transform.position.x) / Time.fixedDeltaTime;
-
-        rb.linearVelocity = new Vector2(xVel, scrollSpeed);
+        transform.position = targetLeaf.transform.position;
+        currentLeaf = targetLeaf;
+        currentLeaf.SetHasPlayer(true);
+        isDashing = false;
     }
 
-    /// <summary>
-    /// Called by WindChimingForestGameManager on respawn.
-    /// Teleports to the given position and resets to the given lane.
-    /// </summary>
-    public void RespawnAt(Vector3 position, int laneIndex)
+    private void OnDrawGizmosSelected()
     {
-        transform.position = position;
-        CurrentLaneIndex   = Mathf.Clamp(laneIndex, 0, laneXPositions.Length - 1);
-        dashTimer          = 0f;
-        rb.linearVelocity  = Vector2.zero;
+        Vector2 boxCenter = (Vector2)transform.position + Vector2.right * dashDirection * detectionDistance;
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireCube(boxCenter, detectionBoxSize);
     }
 }

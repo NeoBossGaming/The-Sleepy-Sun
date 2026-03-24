@@ -1,26 +1,36 @@
 using UnityEngine;
 
 /// <summary>
-/// Player controller for the Tall Grass Path trial.
-/// Extends PlayerMovement with an isHidden state that activates when
-/// the player is inside a "Grass"-tagged trigger collider.
+/// TallGrass player controller. Extends the base PlayerMovement.
 ///
-/// Inspector Setup:
-///   - Attach to player root GameObject alongside PlayerInput, Rigidbody2D, SpriteRenderer
-///   - Rigidbody2D: Gravity Scale = 0, Freeze Rotation Z, Body Type = Dynamic
-///   - Tag player as "Player"
-///   - Grass patches: Collider2D with Is Trigger = true, tagged "Grass"
+/// EXTENSIONS:
+///   - Adds IsHidden: set true when inside a "TallGrass" trigger, false when outside.
+///   - Reduces sprite opacity to 50% when hidden as a visual cue.
+///   - Movement itself (4-directional top-down) is fully inherited from PlayerMovement.
+///
+/// DESIGN: This script does not handle capture logic.
+/// It only manages its own stealth state and notifies nothing.
+/// The TallGrassShadowBird reads IsHidden and notifies the Manager.
 /// </summary>
 [RequireComponent(typeof(SpriteRenderer))]
 public class TallGrassPlayerController : PlayerMovement
 {
-    [Header("Hiding")]
-    [SerializeField] private float hiddenAlpha = 0.5f;
+    // --- State ---
+    private bool isHidden = false;
 
-    public bool isHidden = false;
-
+    // --- Cached ---
     private SpriteRenderer spriteRenderer;
-    private int grassOverlapCount = 0; // Tracks overlapping grass patches to avoid early un-hiding
+
+    // Opacity values for visual feedback
+    private const float HiddenAlpha = 0.45f;
+    private const float VisibleAlpha = 1.0f;
+
+    // --- Public API ---
+    public bool IsHidden => isHidden;
+
+    // -------------------------------------------------------------------------
+    // Lifecycle
+    // -------------------------------------------------------------------------
 
     protected override void Start()
     {
@@ -28,32 +38,37 @@ public class TallGrassPlayerController : PlayerMovement
         spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
+    // -------------------------------------------------------------------------
+    // Stealth Trigger Detection
+    // -------------------------------------------------------------------------
+
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (!other.CompareTag("Grass")) return;
-
-        grassOverlapCount++;
-        isHidden = true;
-        SetAlpha(hiddenAlpha);
+        if (other.CompareTag("TallGrass"))
+        {
+            isHidden = true;
+            SetSpriteAlpha(HiddenAlpha);
+        }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (!other.CompareTag("Grass")) return;
-
-        grassOverlapCount = Mathf.Max(0, grassOverlapCount - 1);
-
-        // Only un-hide when fully out of all grass patches
-        if (grassOverlapCount == 0)
+        if (other.CompareTag("TallGrass"))
         {
             isHidden = false;
-            SetAlpha(1f);
+            SetSpriteAlpha(VisibleAlpha);
         }
     }
 
-    private void SetAlpha(float alpha)
+    // -------------------------------------------------------------------------
+    // Private Helpers
+    // -------------------------------------------------------------------------
+
+    private void SetSpriteAlpha(float alpha)
     {
+        if (spriteRenderer == null) return;
         Color c = spriteRenderer.color;
-        spriteRenderer.color = new Color(c.r, c.g, c.b, alpha);
+        c.a = alpha;
+        spriteRenderer.color = c;
     }
 }

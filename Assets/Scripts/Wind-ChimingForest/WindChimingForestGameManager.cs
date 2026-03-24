@@ -1,154 +1,234 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine.Events;
 
-/// <summary>
-/// Manages the Wind-Chiming Forest rhythm trial.
-///
-/// Responsibilities:
-///   - Runs the BPM-based beat cycle that triggers leaf shaking
-///   - Handles Umbra Interference (called by WindChimingForestUmbraTrigger at midpoint)
-///   - Respawns the player when they fall
-///   - Fires the win condition when the player reaches the Silver Leaf platform
-///
-/// Inspector Setup:
-///   - Create an empty GameObject "WindChimingForestGameManager"
-///   - Drag ALL WindChimingForestLeaf objects into the All Leaves array
-///   - Assign Player (WindChimingForestPlayerController)
-///   - Create an empty GameObject "RespawnPoint" at the left shore start position; assign it
-///   - Assign the scene's GameManager
-///   - Wire UnityEvents to audio/visual triggers as needed
-/// </summary>
 public class WindChimingForestGameManager : MonoBehaviour
 {
-    [Header("Leaves")]
-    [SerializeField] private WindChimingForestLeaf[] allLeaves;
+    [Header("Scene References")]
+    [SerializeField] private WindChimingForestPlayerController playerController;
+    [SerializeField] private Transform leafRowParent;
+    [SerializeField] private GameManager globalGameManager;
 
-    [Header("Rhythm")]
-    [SerializeField] private float bpm = 120f;
-    [SerializeField] private int   cycleBeats = 4;   // Beat cycles between each shake event
+    [Header("Scroll Settings")]
+    [SerializeField] private float scrollSpeed = 2f;
+    [SerializeField] private float winYThreshold = 50f;
 
-    [Header("Difficulty")]
-    [SerializeField] private int baseDifficulty = 2; // Leaves shaken per cycle at normal difficulty
-    private int currentDifficulty;
+    [Header("Leaf Settings")]
+    [SerializeField] private GameObject leafPrefab;
+    [SerializeField] private int leafCount = 6;
+    [SerializeField] private float leafSpacing = 2f;
+
+    [Header("Shake Cycle")]
+    [SerializeField] private float shakeInterval = 3f;
+    [SerializeField] private int leavesPerCycle = 2;
+    [SerializeField] private float shakeDuration = 0.7f;
+    [SerializeField] private float disappearDelay = 0.3f;
+
+    [Header("Checkpoints")]
+    [SerializeField] private float[] checkpointYOffsets;
 
     [Header("Umbra Interference")]
-    [Tooltip("Extra leaves shaken during Umbra Interference on top of baseDifficulty")]
-    [SerializeField] private int   umbraExtraDifficulty      = 3;
-    [SerializeField] private float umbraInterferenceDuration  = 10f;
-    public UnityEvent onUmbraInterference;    // Hook to: play Umbra audio sting, show dark wave VFX
-    public UnityEvent onUmbraInterferenceEnd; // Hook to: restore normal music/visuals
-
-    [Header("References")]
-    [SerializeField] private WindChimingForestPlayerController player;
-    [SerializeField] private Transform respawnPoint;
-    [SerializeField] private GameManager mainGameManager;
+    [SerializeField] private float[] umbraYTriggers;
+    [SerializeField] private float umbraScrollSpeedBonus = 0.8f;
+    [SerializeField] private int umbraExtraLeavesPerCycle = 1;
+    [SerializeField] private float umbraShakeDurationReduction = 0.15f;
 
     [Header("Events")]
-    public UnityEvent onPlayerFell;  // Hook to: screen flash, "oof" sound
-    public UnityEvent onPlayerWin;   // Hook to: victory cutscene, dialogue
+    public UnityEvent onGameStart;
+    public UnityEvent onWin;
+    public UnityEvent onPlayerDied;
+    public UnityEvent onUmbraInterference;
 
-    private float beatTimer = 0f;
-    private float secondsPerBeat;
-    private bool isGameActive       = true;
-    private bool hasWon             = false;
-    private bool isProcessingDeath  = false;
+    private float yOffset = 0f;
+    private Vector3 leafRowStartPosition;
+    private bool isRunning = false;
+    private bool isHandlingDeath = false;
+    private int lastCheckpointIndex = -1;
+    private bool[] umbraTriggered;
+    private List<WindChimingForestLeaf> leaves = new List<WindChimingForestLeaf>();
+    
+    // Store reference to stop stacking
+    private Coroutine shakeRoutine;
 
-    void Start()
+    void Awake()
     {
-        currentDifficulty = baseDifficulty;
-        secondsPerBeat    = 60f / bpm;
-
-        if (player == null)
-            player = FindFirstObjectByType<WindChimingForestPlayerController>();
-
-        if (mainGameManager == null)
-            mainGameManager = FindFirstObjectByType<GameManager>();
+        leafRowStartPosition = leafRowParent.position;
+        umbraTriggered = new bool[umbraYTriggers != null ? umbraYTriggers.Length : 0];
+        StartGame();
     }
 
+    // Switched to Update for smoother visual scrolling with player/leaves
     void Update()
     {
-        if (!isGameActive) return;
+        if (!isRunning) return;
 
-        beatTimer += Time.deltaTime;
-        if (beatTimer >= secondsPerBeat * cycleBeats)
+        ScrollWorld();
+        CheckCheckpoints();
+        CheckUmbraTriggers();
+        CheckWinCondition();
+        CheckPlayerDeath();
+    }
+
+    public void StartGame()
+    {
+        yOffset = 0f;
+        lastCheckpointIndex = -1;
+        isHandlingDeath = false;
+
+        SpawnLeaves();
+        playerController.SetCanMove(true);
+        isRunning = true;
+
+        if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+        shakeRoutine = StartCoroutine(ShakeCycleRoutine());
+        onGameStart?.Invoke();
+    }
+
+    public void PauseGame()
+    {
+        isRunning = false;
+        playerController.SetCanMove(false);
+        if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+    }
+
+    public void ResumeGame()
+    {
+        isRunning = true;
+        playerController.SetCanMove(true);
+        if (shakeRoutine != null) StopCoroutine(shakeRoutine);
+        shakeRoutine = StartCoroutine(ShakeCycleRoutine());
+    }
+
+    private void ScrollWorld()
+    {
+        yOffset += scrollSpeed * Time.deltaTime;
+        leafRowParent.position = leafRowStartPosition + Vector3.up * yOffset;
+    }
+
+    private void SpawnLeaves()
+    {
+        foreach (var leaf in leaves)
+            if (leaf != null) Destroy(leaf.gameObject);
+        leaves.Clear();
+
+        float totalWidth = leafSpacing * (leafCount - 1);
+        float startX = -totalWidth / 2f;
+
+        for (int i = 0; i < leafCount; i++)
         {
-            beatTimer = 0f;
-            RunShakeCycle();
+            float x = startX + i * leafSpacing;
+            GameObject go = Instantiate(leafPrefab, leafRowParent);
+            go.transform.localPosition = new Vector3(x, 0f, 0f);
+
+            WindChimingForestLeaf leaf = go.GetComponent<WindChimingForestLeaf>();
+            leaf.InitPosition(); // Call this to capture local position AFTER setting it
+            leaves.Add(leaf);
+        }
+
+        int middleIndex = leafCount / 2;
+        playerController.SetCurrentLeaf(leaves[middleIndex]);
+    }
+
+    private IEnumerator ShakeCycleRoutine()
+    {
+        while (isRunning)
+        {
+            yield return new WaitForSeconds(shakeInterval);
+            TriggerShakeCycle();
         }
     }
 
-    /// <summary>
-    /// Picks 'currentDifficulty' random leaves and triggers their shake sequence.
-    /// The same leaf can be picked multiple times, but TriggerShake() ignores duplicate calls.
-    /// </summary>
-    private void RunShakeCycle()
+    private void TriggerShakeCycle()
     {
-        if (allLeaves == null || allLeaves.Length == 0) return;
-
-        for (int i = 0; i < currentDifficulty; i++)
+        List<WindChimingForestLeaf> candidates = new List<WindChimingForestLeaf>();
+        foreach (var leaf in leaves)
         {
-            int index = Random.Range(0, allLeaves.Length);
-            allLeaves[index].TriggerShake();
+            // Check if NOT already shaking to avoid logic overlaps
+            if (leaf != null && leaf.IsActive && !leaf.HasPlayer && !leaf.IsShaking)
+                candidates.Add(leaf);
+        }
+
+        int count = Mathf.Min(leavesPerCycle, candidates.Count);
+        for (int i = 0; i < count; i++)
+        {
+            int randomIndex = Random.Range(0, candidates.Count);
+            candidates[randomIndex].TriggerShake(shakeDuration, disappearDelay);
+            candidates.RemoveAt(randomIndex);
         }
     }
 
-    /// <summary>
-    /// Called by WindChimingForestUmbraTrigger when the player crosses the midpoint.
-    /// Spikes difficulty for umbraInterferenceDuration seconds, then returns to normal.
-    /// </summary>
-    public void TriggerUmbraInterference()
+    private void CheckCheckpoints()
     {
-        StartCoroutine(UmbraInterferenceRoutine());
+        if (checkpointYOffsets == null) return;
+        for (int i = lastCheckpointIndex + 1; i < checkpointYOffsets.Length; i++)
+        {
+            if (yOffset >= checkpointYOffsets[i])
+                lastCheckpointIndex = i;
+        }
     }
 
-    private IEnumerator UmbraInterferenceRoutine()
+    private void CheckPlayerDeath()
     {
-        currentDifficulty = baseDifficulty + umbraExtraDifficulty;
-        onUmbraInterference?.Invoke();
-        Debug.Log("[WindChimingForest] Umbra Interference! Difficulty spiked.");
+        if (isHandlingDeath) return;
 
-        yield return new WaitForSeconds(umbraInterferenceDuration);
-
-        currentDifficulty = baseDifficulty;
-        onUmbraInterferenceEnd?.Invoke();
-        Debug.Log("[WindChimingForest] Umbra Interference ended. Difficulty restored.");
-    }
-
-    /// <summary>
-    /// Called by WindChimingForestPlayerController when the player's current leaf collapses.
-    /// </summary>
-    public void PlayerFell()
-    {
-        if (isProcessingDeath || hasWon) return;
-        StartCoroutine(RespawnRoutine());
-    }
-
-    /// <summary>
-    /// Called by WindChimingForestGoalZone when the player reaches the Silver Leaf platform.
-    /// </summary>
-    public void PlayerReachedGoal()
-    {
-        if (hasWon) return;
-        hasWon      = true;
-        isGameActive = false;
-
-        mainGameManager?.SetSilverLeaf(true);
-        onPlayerWin?.Invoke();
-        Debug.Log("[WindChimingForest] Trial 1 Complete — Silver Leaf collected!");
+        WindChimingForestLeaf current = playerController.CurrentLeaf;
+        if (current == null || !current.IsActive)
+        {
+            isHandlingDeath = true;
+            onPlayerDied?.Invoke();
+            StartCoroutine(RespawnRoutine());
+        }
     }
 
     private IEnumerator RespawnRoutine()
     {
-        isProcessingDeath = true;
-        onPlayerFell?.Invoke();
+        PauseGame();
+        yield return new WaitForSeconds(0.6f);
 
-        yield return new WaitForSeconds(1f);
+        float respawnY = lastCheckpointIndex >= 0 ? checkpointYOffsets[lastCheckpointIndex] : 0f;
+        yOffset = respawnY;
+        leafRowParent.position = leafRowStartPosition + Vector3.up * yOffset;
 
-        // Reset player position and clear the current leaf reference
-        player.transform.position = respawnPoint.position;
-        player.currentLeaf = null;
+        foreach (var leaf in leaves)
+            if (leaf != null) leaf.Reactivate();
 
-        isProcessingDeath = false;
+        int middleIndex = leafCount / 2;
+        if (middleIndex < leaves.Count && leaves[middleIndex] != null)
+            playerController.SetCurrentLeaf(leaves[middleIndex]);
+
+        isHandlingDeath = false;
+        ResumeGame();
+    }
+
+    private void CheckUmbraTriggers()
+    {
+        if (umbraYTriggers == null) return;
+        for (int i = 0; i < umbraYTriggers.Length; i++)
+        {
+            if (!umbraTriggered[i] && yOffset >= umbraYTriggers[i])
+            {
+                umbraTriggered[i] = true;
+                StartCoroutine(UmbraInterferenceRoutine());
+            }
+        }
+    }
+
+    private IEnumerator UmbraInterferenceRoutine()
+    {
+        scrollSpeed += umbraScrollSpeedBonus;
+        leavesPerCycle += umbraExtraLeavesPerCycle;
+        shakeDuration = Mathf.Max(0.3f, shakeDuration - umbraShakeDurationReduction);
+        onUmbraInterference?.Invoke();
+        yield return null;
+    }
+
+    private void CheckWinCondition()
+    {
+        if (yOffset < winYThreshold) return;
+        isRunning = false;
+        playerController.SetCanMove(false);
+        globalGameManager?.SetSilverLeaf(true);
+        onWin?.Invoke();
     }
 }
