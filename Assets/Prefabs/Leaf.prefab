@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6821909811187047464}
   - component: {fileID: 6687631854683524178}
   - component: {fileID: 7784436191173854277}
-  - component: {fileID: 865247729684977822}
+  - component: {fileID: 5335250533803309369}
   m_Layer: 3
   m_Name: Leaf
   m_TagString: Leaf
@@ -163,7 +163,7 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 4.48, y: 2.12}
   m_EdgeRadius: 0
---- !u!114 &865247729684977822
+--- !u!114 &5335250533803309369
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -172,10 +172,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 6101503399418994689}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ef90e46df71e45e4db7849ad7dde866c, type: 3}
+  m_Script: {fileID: 11500000, guid: 1dbab0d2522338d4cbe0ced69012eb79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isSafe: 1
   shakeDuration: 1
-  shakeIntensity: 0.1
+  shakeAmount: 0.1
   collapsedDuration: 1
