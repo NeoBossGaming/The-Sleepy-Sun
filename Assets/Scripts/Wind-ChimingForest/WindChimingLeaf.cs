@@ -1,51 +1,28 @@
 using UnityEngine;
 using System.Collections;
 
-/// <summary>
-/// Represents a single lily-pad leaf in the Wind-Chiming Forest.
-/// 
-/// Y position is driven entirely by WindChimingGameManager.CurrentScrollOffset so that
-/// all leaves scroll upward in sync as one unified field — no Rigidbody, no Translate.
-/// 
-/// Also acts as a JumpAnchor: the player can target and land on this leaf.
-/// The GameManager tells this leaf WHEN to shake; this leaf handles HOW.
-/// </summary>
 public class WindChimingLeaf : MonoBehaviour
 {
-    [Header("Shake Settings")]
-    [SerializeField] private float shakeDuration    = 1.0f; // how long it shakes before collapsing
-    [SerializeField] private float shakeAmount      = 0.1f; // max x offset during shake
-    [SerializeField] private float collapsedDuration = 1.0f; // how long it stays gone
 
-    // -------------------------------------------------------------------------
-    // Public state — read by WindChimingPlayerController each frame
-    // -------------------------------------------------------------------------
+    [Header("Visuals")]
+    [SerializeField] private Transform leafVisualTransform; // The new child object
+    [SerializeField] private SpriteRenderer leafSprite;     // The sprite on the child object
+
     public bool IsSafe { get; private set; } = true;
 
-    // -------------------------------------------------------------------------
-    // Private scroll tracking
-    // -------------------------------------------------------------------------
-    private float originalWorldY; // Y position when the game started (scroll offset = 0)
-    private float originalWorldX; // X position never changes, kept for clean position sets
+    private float originalWorldY; 
+    private float originalWorldX; 
     private WindChimingGameManager gameManager;
 
-    private float xShakeOffset; // applied on top of originalWorldX during shake
+    private float xShakeOffset; 
     private bool  isShaking;
 
-    private Transform occupant; // the player transform currently parented to this leaf
+    private Transform occupant; 
 
-    // -------------------------------------------------------------------------
-    // Initialisation & Reset (called by GameManager, not Unity lifecycle)
-    // -------------------------------------------------------------------------
-
-    /// <summary>
-    /// Called by WindChimingGameManager at game start.
-    /// Captures the designer-placed world position as the scroll-zero baseline.
-    /// </summary>
     public void InitializeLeaf(WindChimingGameManager manager)
     {
-        gameManager   = manager;
-        originalWorldY = transform.position.y; // pre-placed Y = scroll-zero Y
+        gameManager    = manager;
+        originalWorldY = transform.position.y; 
         originalWorldX = transform.position.x;
 
         IsSafe       = true;
@@ -53,15 +30,10 @@ public class WindChimingLeaf : MonoBehaviour
         isShaking    = false;
         occupant     = null;
 
-        GetComponent<SpriteRenderer>().enabled = true;
-        GetComponent<Collider2D>().enabled     = true;
+        leafSprite.enabled = true;
+        GetComponent<Collider2D>().enabled = true;
     }
 
-    /// <summary>
-    /// Called by WindChimingGameManager on checkpoint reset.
-    /// Stops all in-progress shake coroutines and restores safe state.
-    /// originalWorldX/Y are unchanged — the designer-placed position is permanent.
-    /// </summary>
     public void ResetLeaf(WindChimingGameManager manager)
     {
         StopAllCoroutines();
@@ -72,69 +44,63 @@ public class WindChimingLeaf : MonoBehaviour
         isShaking    = false;
         occupant     = null;
 
-        GetComponent<SpriteRenderer>().enabled = true;
-        GetComponent<Collider2D>().enabled     = true;
-    }
+        // Reset the visual child to center
+        if (leafVisualTransform != null)
+        {
+            leafVisualTransform.localPosition = Vector3.zero;
+        }
 
-    // -------------------------------------------------------------------------
-    // Scroll sync — runs every frame
-    // -------------------------------------------------------------------------
+        leafSprite.enabled = true;
+        GetComponent<Collider2D>().enabled = true;
+    }
 
     void Update()
     {
         if (gameManager == null) return;
 
-        // All leaves share the same CurrentScrollOffset so they scroll as one.
-        // Formula: world Y = designer-placed Y + how far the world has scrolled.
+        // 1. The main parent object ONLY handles the vertical scroll
         float syncedY = originalWorldY + gameManager.CurrentScrollOffset;
-        transform.position = new Vector3(originalWorldX + xShakeOffset, syncedY, transform.position.z);
+        transform.position = new Vector3(originalWorldX, syncedY, transform.position.z);
+
+        // 2. The child visual object ONLY handles the horizontal shake
+        if (leafVisualTransform != null)
+        {
+            leafVisualTransform.localPosition = new Vector3(xShakeOffset, 0f, 0f);
+        }
     }
 
-    // -------------------------------------------------------------------------
-    // Shake / collapse — driven by GameManager beat cycle
-    // -------------------------------------------------------------------------
-
-    /// <summary>
-    /// Called by WindChimingGameManager. Begins the shake → collapse → respawn sequence.
-    /// Ignored if the leaf is already shaking.
-    /// </summary>
-    public void TriggerShake()
+    public void TriggerShake(float duration, float amount, float collapseTime)
     {
         if (isShaking) return;
-        StartCoroutine(ShakeSequence());
+        StartCoroutine(ShakeSequence(duration, amount, collapseTime));
     }
 
-    IEnumerator ShakeSequence()
+    IEnumerator ShakeSequence(float duration, float amount, float collapseTime)
     {
         isShaking = true;
         float elapsed = 0f;
 
-        // Phase 1: Shake — leaf wobbles but is STILL SAFE (player can stand on it)
-        while (elapsed < shakeDuration)
+        while (elapsed < duration)
         {
-            xShakeOffset = Random.Range(-shakeAmount, shakeAmount);
+            xShakeOffset = Random.Range(-amount, amount);
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // Phase 2: Collapse — leaf disappears, becomes unsafe
+        // Add the visual reset code here if you applied the visual separation fix previously!
         xShakeOffset = 0f;
+
         IsSafe = false;
         GetComponent<SpriteRenderer>().enabled = false;
         GetComponent<Collider2D>().enabled     = false;
 
-        yield return new WaitForSeconds(collapsedDuration);
+        yield return new WaitForSeconds(collapseTime);
 
-        // Phase 3: Respawn — leaf returns to normal
         IsSafe    = true;
         isShaking = false;
         GetComponent<SpriteRenderer>().enabled = true;
         GetComponent<Collider2D>().enabled     = true;
     }
-
-    // -------------------------------------------------------------------------
-    // Occupant tracking — used by WindChimingPlayerController
-    // -------------------------------------------------------------------------
 
     public void SetOccupant(Transform t) => occupant = t;
     public void ClearOccupant()          => occupant = null;

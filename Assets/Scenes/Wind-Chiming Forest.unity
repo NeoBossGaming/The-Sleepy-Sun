@@ -4226,11 +4226,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   speed: 200
-  canMove: 1
+  canMove: 0
   horizontalSpeed: 3
   detectionRange: 2
   leafTag: Leaf
-  jumpSpeed: 6
   gameManager: {fileID: 904149556}
 --- !u!1001 &310437686
 PrefabInstance:
@@ -4500,7 +4499,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   riseSpeed: 2
   bpm: 120
-  baseDifficulty: 2
+  baseDifficulty: 4
+  baseShakeDuration: 2
+  shakeDurationDecreasePerLevel: 0.2
+  minShakeDuration: 0.5
+  baseCollapseDuration: 1
+  collapseDurationIncreasePerLevel: 0.2
+  baseShakeAmount: 0.1
+  shakeAmountIncreasePerLevel: 0.05
+  baseJumpSpeed: 6
+  jumpSpeedIncreasePerLevel: 1.5
   allLeaves:
   - {fileID: 653513071}
   - {fileID: 388846745}
@@ -4510,7 +4518,7 @@ MonoBehaviour:
   playerSpawnLeaf: {fileID: 1915384011}
   checkpointScrollOffsets: []
   umbraInterferenceOffset: 10
-  umbraDifficultyBonus: 2
+  umbraDifficultyBonus: 4
   umbraDuration: 10
   finishScrollOffset: 100
 --- !u!1001 &1469596183

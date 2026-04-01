@@ -15,32 +15,41 @@ public class WindChimingGameManager : MonoBehaviour
 
     [Header("Beat Settings")]
     [SerializeField] private float bpm = 120f;
-    [SerializeField] private int baseDifficulty = 2;
+    [SerializeField] private int baseDifficulty = 0; // Starts at 0 multiplier
+
+    [Header("Difficulty Scaling")]
+    [SerializeField] private float baseShakeDuration = 2.0f;
+    [SerializeField] private float shakeDurationDecreasePerLevel = 0.2f; // Reduces shake time so they drop faster
+    [SerializeField] private float minShakeDuration = 0.5f; // Absolute fastest it can drop
+
+    [SerializeField] private float baseCollapseDuration = 1.0f;
+    [SerializeField] private float collapseDurationIncreasePerLevel = 0.2f; // Stays dropped longer
+
+    [SerializeField] private float baseShakeAmount = 0.1f;
+    [SerializeField] private float shakeAmountIncreasePerLevel = 0.05f; // Shakes more violently
+
+    [SerializeField] private float baseJumpSpeed = 6f;
+    [SerializeField] private float jumpSpeedIncreasePerLevel = 1.5f; // Player jumps faster
 
     [Header("Scene References")]
     [SerializeField] private WindChimingLeaf[] allLeaves;
     [SerializeField] private WindChimingLeaf playerSpawnLeaf;
 
-    // ---------------------------------------------------------------------------
-    // Checkpoints
-    // Set these in the Inspector as scroll offset values (world units scrolled).
-    // Example: 0, 5, 10 means checkpoints at start, 5 units scrolled, 10 units.
-    // ---------------------------------------------------------------------------
     [Header("Checkpoints (Scroll Offset Values)")]
     [SerializeField] private float[] checkpointScrollOffsets;
 
     [Header("Umbra Interference")]
-    [SerializeField] private float umbraInterferenceOffset;   // scroll offset that triggers the event
-    [SerializeField] private int   umbraDifficultyBonus = 2;  // extra leaves that shake during event
-    [SerializeField] private float umbraDuration = 10f;       // how long the event lasts (seconds)
+    [SerializeField] private float umbraInterferenceOffset;
+    [SerializeField] private int   umbraDifficultyBonus = 2; // Increases the difficulty multiplier during event
+    [SerializeField] private float umbraDuration = 10f;
 
     [Header("Win Condition")]
-    [SerializeField] private float finishScrollOffset; // reaching this offset ends the minigame
+    [SerializeField] private float finishScrollOffset;
 
-    // ---------------------------------------------------------------------------
-    // Public read-only scroll value — leaves poll this every Update to sync Y.
-    // ---------------------------------------------------------------------------
     public float CurrentScrollOffset { get; private set; }
+    
+    // Public property so the player can read their current jump speed
+    public float CurrentJumpSpeed => baseJumpSpeed + (currentDifficulty * jumpSpeedIncreasePerLevel);
 
     private WindChimingPlayerController player;
     private int   currentDifficulty;
@@ -50,18 +59,12 @@ public class WindChimingGameManager : MonoBehaviour
     private bool  umbraTriggered;
     private bool  finishTriggered;
 
-    // -------------------------------------------------------------------------
-
     void Start()
     {
         player = FindFirstObjectByType<WindChimingPlayerController>();
         InitializeGame();
     }
 
-    /// <summary>
-    /// Full game initialisation. Called at Start and can be called again externally
-    /// if you ever want a hard restart from scroll offset 0.
-    /// </summary>
     public void InitializeGame()
     {
         CurrentScrollOffset = 0f;
@@ -70,7 +73,7 @@ public class WindChimingGameManager : MonoBehaviour
         beatTimer           = 0f;
         umbraTriggered      = false;
         finishTriggered     = false;
-        gameRunning         = false; // keep false until everything is ready
+        gameRunning         = false;
 
         foreach (var leaf in allLeaves)
             leaf.InitializeLeaf(this);
@@ -84,10 +87,8 @@ public class WindChimingGameManager : MonoBehaviour
     {
         if (!gameRunning) return;
 
-        // --- Scroll the world upward ---
         CurrentScrollOffset += riseSpeed * Time.deltaTime;
 
-        // --- Beat cycle: every 4 beats, trigger leaf shakes ---
         beatTimer += Time.deltaTime;
         if (beatTimer >= secondsPerBeat * 4f)
         {
@@ -95,14 +96,12 @@ public class WindChimingGameManager : MonoBehaviour
             StartCoroutine(RunBeatCycle());
         }
 
-        // --- Umbra interference triggers at a designer-set scroll offset ---
         if (!umbraTriggered && CurrentScrollOffset >= umbraInterferenceOffset)
         {
             umbraTriggered = true;
             StartCoroutine(UmbraInterference());
         }
 
-        // --- Win condition ---
         if (!finishTriggered && CurrentScrollOffset >= finishScrollOffset)
         {
             finishTriggered = true;
@@ -110,49 +109,41 @@ public class WindChimingGameManager : MonoBehaviour
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Beat cycle
-    // -------------------------------------------------------------------------
-
     IEnumerator RunBeatCycle()
     {
-        // Pick 'currentDifficulty' random leaves and tell each to shake.
-        // Duplicates are allowed — the same leaf can be picked twice, but
-        // WindChimingLeaf.TriggerShake() guards against double-shaking.
-        for (int i = 0; i < currentDifficulty; i++)
+        // 1. Calculate the current difficulty variables based on the current level
+        float currentShakeDur = Mathf.Max(minShakeDuration, baseShakeDuration - (currentDifficulty * shakeDurationDecreasePerLevel));
+        float currentShakeAmt = baseShakeAmount + (currentDifficulty * shakeAmountIncreasePerLevel);
+        float currentCollapseDur = baseCollapseDuration + (currentDifficulty * collapseDurationIncreasePerLevel);
+
+        // 2. Pick exactly ONE leaf to be the safe leaf
+        int safeIndex = Random.Range(0, allLeaves.Length);
+        WindChimingLeaf safeLeaf = allLeaves[safeIndex];
+
+        // 3. Tell every OTHER leaf to shake and drop
+        foreach (var leaf in allLeaves)
         {
-            int index = Random.Range(0, allLeaves.Length);
-            allLeaves[index].TriggerShake();
+            if (leaf != safeLeaf)
+            {
+                leaf.TriggerShake(currentShakeDur, currentShakeAmt, currentCollapseDur);
+            }
         }
         yield return null;
     }
 
-    // -------------------------------------------------------------------------
-    // Umbra interference
-    // -------------------------------------------------------------------------
-
     IEnumerator UmbraInterference()
     {
-        // Temporarily increase difficulty, then restore it
         currentDifficulty += umbraDifficultyBonus;
         yield return new WaitForSeconds(umbraDuration);
         currentDifficulty -= umbraDifficultyBonus;
     }
 
-    // -------------------------------------------------------------------------
-    // Win / Lose
-    // -------------------------------------------------------------------------
-
     void OnFinish()
     {
         gameRunning = false;
-        // PLACEHOLDER — replace this with a proper event / scene transition later
         FindFirstObjectByType<GameManager>()?.SetSilverLeaf(true);
     }
 
-    /// <summary>
-    /// Called by WindChimingPlayerController when the player lands on an unsafe leaf.
-    /// </summary>
     public void OnPlayerDied()
     {
         if (!gameRunning) return;
@@ -162,7 +153,6 @@ public class WindChimingGameManager : MonoBehaviour
 
     IEnumerator ResetToCheckpoint()
     {
-        // Find the last checkpoint the player passed (highest offset <= current)
         float targetOffset = 0f;
         foreach (float cp in checkpointScrollOffsets)
         {
@@ -170,24 +160,20 @@ public class WindChimingGameManager : MonoBehaviour
                 targetOffset = cp;
         }
 
-        // Snap scroll back to checkpoint
         CurrentScrollOffset = targetOffset;
 
-        // Reset all leaves to clean state
         foreach (var leaf in allLeaves)
             leaf.ResetLeaf(this);
 
-        // Reset player to spawn leaf
         player?.SpawnOnLeaf(playerSpawnLeaf);
 
-        // Recalculate difficulty — umbra may already be active at this checkpoint
         currentDifficulty  = baseDifficulty;
         umbraTriggered     = targetOffset >= umbraInterferenceOffset;
         if (umbraTriggered) currentDifficulty += umbraDifficultyBonus;
 
         beatTimer = 0f;
 
-        yield return null; // One frame pause so all leaf positions update before unblocking
+        yield return null; 
         gameRunning = true;
     }
 }

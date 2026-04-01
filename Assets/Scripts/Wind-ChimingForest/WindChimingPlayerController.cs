@@ -28,8 +28,6 @@ public class WindChimingPlayerController : PlayerMovement
     [SerializeField] private float detectionRange = 2.0f;
     [SerializeField] private string leafTag = "Leaf";
 
-    [Header("Jump Settings")]
-    [SerializeField] private float jumpSpeed = 6f;
 
     [Header("References")]
     [SerializeField] private WindChimingGameManager gameManager;
@@ -140,7 +138,6 @@ public class WindChimingPlayerController : PlayerMovement
     IEnumerator JumpToLeaf(WindChimingLeaf target)
     {
         isJumping = true;
-        SetCanMove(false);
 
         // Detach from current leaf — player is now in free-flight
         if (currentLeaf != null) currentLeaf.ClearOccupant();
@@ -150,8 +147,8 @@ public class WindChimingPlayerController : PlayerMovement
         {
             transform.position = Vector3.MoveTowards(
                 transform.position,
-                target.transform.position, // live position — the leaf is moving up
-                jumpSpeed * Time.deltaTime
+                target.transform.position,
+                gameManager.CurrentJumpSpeed * Time.deltaTime
             );
             yield return null;
         }
@@ -160,7 +157,6 @@ public class WindChimingPlayerController : PlayerMovement
             LandOnLeaf(target);
 
         isJumping = false;
-        SetCanMove(true);
     }
 
     // -------------------------------------------------------------------------
@@ -180,7 +176,7 @@ public class WindChimingPlayerController : PlayerMovement
         currentLeaf = null;
 
         LandOnLeaf(leaf);
-        SetCanMove(true);
+        SetCanMove(false);
     }
 
     /// <summary>
