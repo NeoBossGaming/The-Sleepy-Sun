@@ -107,6 +107,7 @@ public class WindChimingGameManager : MonoBehaviour
             finishTriggered = true;
             OnFinish();
         }
+        Debug.Log(currentDifficulty);
     }
 
     IEnumerator RunBeatCycle()
@@ -169,7 +170,7 @@ public class WindChimingGameManager : MonoBehaviour
 
         currentDifficulty  = baseDifficulty;
         umbraTriggered     = targetOffset >= umbraInterferenceOffset;
-        if (umbraTriggered) currentDifficulty += umbraDifficultyBonus;
+        if (umbraTriggered) StartCoroutine(UmbraInterference());
 
         beatTimer = 0f;
 

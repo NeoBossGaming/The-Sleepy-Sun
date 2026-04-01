@@ -1,106 +1,149 @@
 using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Represents a single lily-pad leaf in the Wind-Chiming Forest.
+///
+/// STRUCTURE EXPECTED IN SCENE:
+///   WindChimingLeaf (root) — has Collider2D, this script
+///     └── Visual (child)   — has SpriteRenderer
+///
+/// The ROOT never moves during a shake. Only the Visual child's localPosition
+/// oscillates on X. This means a player parented to the root is NOT thrown around
+/// visually while standing on a shaking leaf — clean separation of concerns.
+///
+/// Y scrolling: root position is driven by WindChimingGameManager.CurrentScrollOffset.
+/// </summary>
 public class WindChimingLeaf : MonoBehaviour
 {
+    [Header("References")]
+    [Tooltip("Child GameObject that holds the SpriteRenderer. This is what visually shakes.")]
+    [SerializeField] private Transform      visual;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Collider2D     leafCollider;
 
-    [Header("Visuals")]
-    [SerializeField] private Transform leafVisualTransform; // The new child object
-    [SerializeField] private SpriteRenderer leafSprite;     // The sprite on the child object
-
+    // -------------------------------------------------------------------------
+    // Public state — polled by WindChimingPlayerController every frame
+    // -------------------------------------------------------------------------
     public bool IsSafe { get; private set; } = true;
 
-    private float originalWorldY; 
-    private float originalWorldX; 
+    // -------------------------------------------------------------------------
+    // Scroll tracking
+    // -------------------------------------------------------------------------
+    private float originalWorldY; // designer-placed Y at scroll offset 0
+    private float originalWorldX;
     private WindChimingGameManager gameManager;
 
-    private float xShakeOffset; 
-    private bool  isShaking;
+    private bool      isShaking;
+    private Transform occupant; // player transform currently parented here
 
-    private Transform occupant; 
+    // -------------------------------------------------------------------------
+    // Init / Reset  (called by GameManager, not Unity lifecycle)
+    // -------------------------------------------------------------------------
 
+    /// <summary>
+    /// Captures the designer-placed world position as the scroll-zero baseline.
+    /// Called once by WindChimingGameManager.InitializeGame().
+    /// </summary>
     public void InitializeLeaf(WindChimingGameManager manager)
     {
         gameManager    = manager;
-        originalWorldY = transform.position.y; 
+        originalWorldY = transform.position.y;
         originalWorldX = transform.position.x;
 
-        IsSafe       = true;
-        xShakeOffset = 0f;
-        isShaking    = false;
-        occupant     = null;
+        IsSafe    = true;
+        isShaking = false;
+        occupant  = null;
 
-        leafSprite.enabled = true;
-        GetComponent<Collider2D>().enabled = true;
+        if (visual != null) visual.localPosition = Vector3.zero;
+        spriteRenderer.enabled = true;
+        leafCollider.enabled   = true;
     }
 
+    /// <summary>
+    /// Stops all in-progress shaking and restores a clean safe state.
+    /// Called by WindChimingGameManager on every checkpoint reset.
+    /// </summary>
     public void ResetLeaf(WindChimingGameManager manager)
     {
         StopAllCoroutines();
 
-        gameManager  = manager;
-        IsSafe       = true;
-        xShakeOffset = 0f;
-        isShaking    = false;
-        occupant     = null;
+        gameManager = manager;
+        IsSafe      = true;
+        isShaking   = false;
+        occupant    = null;
 
-        // Reset the visual child to center
-        if (leafVisualTransform != null)
-        {
-            leafVisualTransform.localPosition = Vector3.zero;
-        }
-
-        leafSprite.enabled = true;
-        GetComponent<Collider2D>().enabled = true;
+        if (visual != null) visual.localPosition = Vector3.zero;
+        spriteRenderer.enabled = true;
+        leafCollider.enabled   = true;
     }
+
+    // -------------------------------------------------------------------------
+    // Scroll sync — runs every frame
+    // -------------------------------------------------------------------------
 
     void Update()
     {
         if (gameManager == null) return;
 
-        // 1. The main parent object ONLY handles the vertical scroll
-        float syncedY = originalWorldY + gameManager.CurrentScrollOffset;
-        transform.position = new Vector3(originalWorldX, syncedY, transform.position.z);
-
-        // 2. The child visual object ONLY handles the horizontal shake
-        if (leafVisualTransform != null)
-        {
-            leafVisualTransform.localPosition = new Vector3(xShakeOffset, 0f, 0f);
-        }
+        // Root only moves on Y to match the global scroll.
+        // Visual handles its own local X offset during shakes.
+        transform.position = new Vector3(
+            originalWorldX,
+            originalWorldY + gameManager.CurrentScrollOffset,
+            transform.position.z
+        );
     }
 
-    public void TriggerShake(float duration, float amount, float collapseTime)
+    // -------------------------------------------------------------------------
+    // Shake / collapse — parameters supplied by GameManager for difficulty scaling
+    // -------------------------------------------------------------------------
+
+    /// <summary>
+    /// Begins shake → collapse → respawn.
+    /// shakeDuration and shakeAmount come from GameManager so difficulty
+    /// scaling lives entirely in one place.
+    /// No-ops if already mid-shake.
+    /// </summary>
+    public void TriggerShake(float shakeDuration, float shakeAmount, float collapsedDuration = 1.0f)
     {
         if (isShaking) return;
-        StartCoroutine(ShakeSequence(duration, amount, collapseTime));
+        StartCoroutine(ShakeSequence(shakeDuration, shakeAmount, collapsedDuration));
     }
 
-    IEnumerator ShakeSequence(float duration, float amount, float collapseTime)
+    IEnumerator ShakeSequence(float shakeDuration, float shakeAmount, float collapsedDuration)
     {
         isShaking = true;
         float elapsed = 0f;
 
-        while (elapsed < duration)
+        // Phase 1: Visual shakes — root and player remain perfectly still
+        while (elapsed < shakeDuration)
         {
-            xShakeOffset = Random.Range(-amount, amount);
+            if (visual != null)
+                visual.localPosition = new Vector3(Random.Range(-shakeAmount, shakeAmount), 0f, 0f);
+
             elapsed += Time.deltaTime;
             yield return null;
         }
 
-        // Add the visual reset code here if you applied the visual separation fix previously!
-        xShakeOffset = 0f;
+        // Phase 2: Collapse
+        if (visual != null) visual.localPosition = Vector3.zero;
+        IsSafe                 = false;
+        spriteRenderer.enabled = false;
+        leafCollider.enabled   = false;
 
-        IsSafe = false;
-        GetComponent<SpriteRenderer>().enabled = false;
-        GetComponent<Collider2D>().enabled     = false;
+        yield return new WaitForSeconds(collapsedDuration);
 
-        yield return new WaitForSeconds(collapseTime);
-
-        IsSafe    = true;
-        isShaking = false;
-        GetComponent<SpriteRenderer>().enabled = true;
-        GetComponent<Collider2D>().enabled     = true;
+        // Phase 3: Respawn
+        IsSafe                 = true;
+        isShaking              = false;
+        spriteRenderer.enabled = true;
+        leafCollider.enabled   = true;
     }
+
+    // -------------------------------------------------------------------------
+    // Occupant tracking — used by WindChimingPlayerController
+    // -------------------------------------------------------------------------
 
     public void SetOccupant(Transform t) => occupant = t;
     public void ClearOccupant()          => occupant = null;

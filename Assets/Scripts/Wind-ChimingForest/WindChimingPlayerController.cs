@@ -5,45 +5,45 @@ using System.Collections;
 /// Player controller for the Wind-Chiming Forest minigame.
 /// Extends PlayerMovement.
 ///
-/// HOW IT WORKS:
-/// - The player is always parented to their current WindChimingLeaf.
-/// - Since leaves drive their own Y via GameManager.CurrentScrollOffset, the player
-///   rides upward automatically as a child — no extra scroll logic needed here.
-/// - Horizontal movement modifies transform.localPosition (not rb.linearVelocity),
-///   because the Rigidbody is set to Kinematic to avoid physics fighting the parent.
-/// - Pressing Dash jumps to the nearest safe leaf in the facing direction.
-/// - Death is only checked while NOT jumping, enabling close-call moments.
+/// KEY BEHAVIOURS:
+/// - Player is always parented to their current WindChimingLeaf root.
+///   Leaf root drives world Y via scroll; player rides for free as a child.
+/// - Horizontal movement uses transform.localPosition (not rb velocity),
+///   because rb is Kinematic to avoid fighting the parent-driven position.
+/// - Dash input triggers a jump to the nearest safe leaf in the facing direction.
+/// - Death is only checked while NOT jumping — close-call window is intentional.
+/// - Jump speed is polled from WindChimingGameManager each frame (difficulty-scaled).
 /// </summary>
 public class WindChimingPlayerController : PlayerMovement
 {
-    // ---------------------------------------------------------------------------
-    // Note: 'speed' inherited from PlayerMovement is intentionally unused here.
-    // Local-position movement needs a much smaller value than velocity-based movement.
-    // Use horizontalSpeed instead.
-    // ---------------------------------------------------------------------------
-    [Header("Horizontal Movement")]
+    [Header("Horizontal Speed")]
+    [Tooltip("Use this instead of the inherited 'speed' field. Local-position movement needs a much smaller value.")]
     [SerializeField] private float horizontalSpeed = 3f;
 
     [Header("Leaf Detection")]
-    [SerializeField] private float detectionRange = 2.0f;
-    [SerializeField] private string leafTag = "Leaf";
-
+    [SerializeField] private float  detectionRange = 2.0f;
+    [SerializeField] private string leafTag        = "Leaf";
 
     [Header("References")]
     [SerializeField] private WindChimingGameManager gameManager;
 
+    // -------------------------------------------------------------------------
+    // Private state
+    // -------------------------------------------------------------------------
     private WindChimingLeaf currentLeaf;
     private WindChimingLeaf targetedLeaf;
-    private float facingDirection = 1f; // 1 = right, -1 = left
-    private bool  isJumping;
+    private float           facingDirection = 1f; // 1 = right, -1 = left
+    private bool            isJumping;
 
+    // -------------------------------------------------------------------------
+    // Init
     // -------------------------------------------------------------------------
 
     protected override void Start()
     {
         base.Start();
 
-        // Kinematic so the Rigidbody never fights the parent-driven Y position
+        // Kinematic: Rigidbody never fights the parent-driven Y position
         rb.bodyType = RigidbodyType2D.Kinematic;
 
         if (gameManager == null)
@@ -51,38 +51,45 @@ public class WindChimingPlayerController : PlayerMovement
     }
 
     // -------------------------------------------------------------------------
-    // Input & movement overrides
+    // Input override
     // -------------------------------------------------------------------------
 
     protected override void HandleInput()
     {
-        // All input is blocked mid-jump (isJumping acts as a global gate)
+        // All input blocked while airborne — this is also what enables close calls.
+        // If the player dashes before their leaf collapses, isJumping = true before
+        // the death check below can fire, so they survive.
         if (isJumping) return;
 
-        // Track the last horizontal direction for leaf detection
+        // Track facing direction for leaf detection
         if (moveValue.x != 0f)
             facingDirection = Mathf.Sign(moveValue.x);
 
-        // Scan for the nearest jumpable leaf each frame
+        // Scan for nearest jumpable leaf every frame
         targetedLeaf = FindNearestSafeLeaf();
 
-        // Dash = jump trigger (WasPressedThisFrame, so only fires once per press)
+        // Dash = jump
         if (playerInput.obtainMoveInputActions().dash && targetedLeaf != null)
             StartCoroutine(JumpToLeaf(targetedLeaf));
 
         // --- Death check ---
-        // Not checked while isJumping is true, so a player who dashes off a leaf
-        // just before it collapses survives (close-call feel).
+        // isJumping guard above means this block is skipped while airborne,
+        // giving the player a close-call window if they jump just in time.
         if (currentLeaf != null && !currentLeaf.IsSafe)
             Die();
     }
 
+    // -------------------------------------------------------------------------
+    // Movement override — local-position based
+    // -------------------------------------------------------------------------
+
     protected override void ApplyMovement()
     {
-        // Guard: must be grounded and allowed to move
         if (!canMove || isJumping) return;
 
-        // Modify local X — the parent leaf handles world Y via the scroll system
+        // Modify local X only.
+        // The parent leaf root handles world Y via scroll — touching it here
+        // would de-sync the player from the scrolling system.
         Vector3 local = transform.localPosition;
         local.x += moveValue.x * horizontalSpeed * Time.fixedDeltaTime;
         transform.localPosition = local;
@@ -93,14 +100,14 @@ public class WindChimingPlayerController : PlayerMovement
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Scans an overlap circle in the facing direction and returns the nearest
-    /// safe leaf that isn't the one the player is already standing on.
-    /// Uses OverlapCircleAll so it never silently misses a closer candidate.
+    /// Casts an overlap circle in the facing direction and returns the nearest
+    /// safe leaf that isn't the player's current one.
+    /// Uses OverlapCircleAll so no closer candidate is silently skipped.
     /// </summary>
     private WindChimingLeaf FindNearestSafeLeaf()
     {
-        Vector2 center = (Vector2)transform.position + new Vector2(facingDirection * detectionRange, 0f);
-        Collider2D[] hits = Physics2D.OverlapCircleAll(center, detectionRange * 0.5f);
+        Vector2      center  = (Vector2)transform.position + new Vector2(facingDirection * detectionRange, 0f);
+        Collider2D[] hits    = Physics2D.OverlapCircleAll(center, detectionRange * 0.5f);
 
         WindChimingLeaf nearest     = null;
         float           nearestDist = float.MaxValue;
@@ -129,26 +136,28 @@ public class WindChimingPlayerController : PlayerMovement
 
     /// <summary>
     /// Slides the player toward a target leaf using MoveTowards.
-    /// The target leaf is itself moving upward, so we chase its live transform
-    /// position each frame — no extra math needed.
-    /// 
-    /// If the target leaf collapses mid-jump, the player still lands on it
-    /// and dies immediately after (close call miss). This is intentional.
+    /// Jump speed is polled from GameManager each frame so the difficulty-scaled
+    /// value is always up to date.
+    /// The target is chased by live transform position — the leaf is moving upward
+    /// during the jump, and we automatically follow it.
     /// </summary>
     IEnumerator JumpToLeaf(WindChimingLeaf target)
     {
         isJumping = true;
+        SetCanMove(false);
 
-        // Detach from current leaf — player is now in free-flight
+        // Detach from current leaf — player is in free flight
         if (currentLeaf != null) currentLeaf.ClearOccupant();
+        currentLeaf = null;
         transform.SetParent(null);
 
         while (target != null && Vector3.Distance(transform.position, target.transform.position) > 0.05f)
         {
+            float speed = gameManager != null ? gameManager.CurrentJumpSpeed : 6f;
             transform.position = Vector3.MoveTowards(
                 transform.position,
-                target.transform.position,
-                gameManager.CurrentJumpSpeed * Time.deltaTime
+                target.transform.position, // live — leaf is scrolling up during jump
+                speed * Time.deltaTime
             );
             yield return null;
         }
@@ -157,15 +166,15 @@ public class WindChimingPlayerController : PlayerMovement
             LandOnLeaf(target);
 
         isJumping = false;
+        SetCanMove(false);
     }
 
     // -------------------------------------------------------------------------
-    // Spawn & landing helpers (called by GameManager on start / checkpoint reset)
+    // Spawn & landing  (called by GameManager)
     // -------------------------------------------------------------------------
 
     /// <summary>
-    /// Places the player on the given leaf.
-    /// Called by WindChimingGameManager at game start and after checkpoint resets.
+    /// Hard-places the player on a leaf. Called at game start and after resets.
     /// </summary>
     public void SpawnOnLeaf(WindChimingLeaf leaf)
     {
@@ -179,11 +188,6 @@ public class WindChimingPlayerController : PlayerMovement
         SetCanMove(false);
     }
 
-    /// <summary>
-    /// Parents the player to a leaf and zeroes local position so they sit at
-    /// the leaf's pivot. Adjust the leaf's pivot in the scene if you want the
-    /// player to sit above rather than at the centre.
-    /// </summary>
     private void LandOnLeaf(WindChimingLeaf leaf)
     {
         currentLeaf = leaf;
@@ -198,8 +202,7 @@ public class WindChimingPlayerController : PlayerMovement
 
     private void Die()
     {
-        // Double-guard: ignore if already mid-jump (close call protection)
-        if (isJumping) return;
+        if (isJumping) return; // redundant guard — HandleInput already skips, but be safe
 
         SetCanMove(false);
 

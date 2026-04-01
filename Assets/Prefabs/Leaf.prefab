@@ -207,8 +207,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1dbab0d2522338d4cbe0ced69012eb79, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  shakeDuration: 1
-  shakeAmount: 0.3
-  collapsedDuration: 1
-  leafVisualTransform: {fileID: 3811123585395589019}
-  leafSprite: {fileID: 8078905574549274896}
+  visual: {fileID: 3811123585395589019}
+  spriteRenderer: {fileID: 8078905574549274896}
+  leafCollider: {fileID: 7784436191173854277}
