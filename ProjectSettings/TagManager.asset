@@ -5,9 +5,9 @@ TagManager:
   serializedVersion: 3
   tags:
   - Leaf
-  - Grass
   - Fish
   - Plastic
+  - TallGrass
   layers:
   - Default
   - TransparentFX
