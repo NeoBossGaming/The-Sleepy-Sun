@@ -4499,7 +4499,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   riseSpeed: 2
   bpm: 120
-  baseDifficulty: 4
+  baseDifficulty: 0
   baseShakeDuration: 2
   shakeDurationDecreasePerLevel: 0.2
   minShakeDuration: 0.5
@@ -4518,7 +4518,7 @@ MonoBehaviour:
   playerSpawnLeaf: {fileID: 1915384011}
   checkpointScrollOffsets: []
   umbraInterferenceOffset: 10
-  umbraDifficultyBonus: 4
+  umbraDifficultyBonus: 2
   umbraDuration: 10
   finishScrollOffset: 100
 --- !u!1001 &1469596183

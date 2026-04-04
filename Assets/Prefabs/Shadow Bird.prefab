@@ -98,6 +98,7 @@ GameObject:
   - component: {fileID: 99499309339248782}
   - component: {fileID: 27146410258824213}
   - component: {fileID: 2773186299573890566}
+  - component: {fileID: 7087720375834327608}
   m_Layer: 0
   m_Name: Shadow Bird
   m_TagString: Untagged
@@ -212,3 +213,19 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 2
+--- !u!114 &7087720375834327608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8600013447802580523}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f128a3de8a70d7469a46db2814dd5a7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  waypoints: []
+  patrolSpeed: 3
+  detectionRadius: 2.5
+  gameManager: {fileID: 0}

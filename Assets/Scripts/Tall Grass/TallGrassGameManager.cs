@@ -61,6 +61,11 @@ public class TallGrassGameManager : MonoBehaviour
             : playerController.transform.position;
     }
 
+    void Start()
+    {
+        StartGame();
+    }
+
     // -------------------------------------------------------------------------
     // Public Flow Control API
     // -------------------------------------------------------------------------
@@ -72,9 +77,8 @@ public class TallGrassGameManager : MonoBehaviour
     {
         isRunning = true;
         playerController.SetCanMove(true);
-
         foreach (var bird in shadowBirds)
-        {
+        {   
             if (bird != null)
                 bird.Activate(playerController);
         }
