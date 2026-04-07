@@ -58,6 +58,9 @@ public class WindChimingGameManager : MonoBehaviour
     private bool  gameRunning;
     private bool  umbraTriggered;
     private bool  finishTriggered;
+    
+    // NEW: Boolean to prevent overlapping beat cycles
+    private bool isBeatCycleActive;
 
     void Start()
     {
@@ -74,6 +77,7 @@ public class WindChimingGameManager : MonoBehaviour
         umbraTriggered      = false;
         finishTriggered     = false;
         gameRunning         = false;
+        isBeatCycleActive   = false;
 
         foreach (var leaf in allLeaves)
             leaf.InitializeLeaf(this);
@@ -89,11 +93,15 @@ public class WindChimingGameManager : MonoBehaviour
 
         CurrentScrollOffset += riseSpeed * Time.deltaTime;
 
-        beatTimer += Time.deltaTime;
-        if (beatTimer >= secondsPerBeat * 4f)
+        // NEW: Only count the timer if a shake sequence is NOT currently happening
+        if (!isBeatCycleActive)
         {
-            beatTimer = 0f;
-            StartCoroutine(RunBeatCycle());
+            beatTimer += Time.deltaTime;
+            if (beatTimer >= secondsPerBeat * 4f)
+            {
+                beatTimer = 0f;
+                StartCoroutine(RunBeatCycle());
+            }
         }
 
         if (!umbraTriggered && CurrentScrollOffset >= umbraInterferenceOffset)
@@ -107,11 +115,14 @@ public class WindChimingGameManager : MonoBehaviour
             finishTriggered = true;
             OnFinish();
         }
-        Debug.Log(currentDifficulty);
+        Debug.Log($"current difficulty: {currentDifficulty}, current jump speed: {CurrentJumpSpeed}");
     }
 
     IEnumerator RunBeatCycle()
     {
+        // Lock the cycle so a new one cannot start
+        isBeatCycleActive = true;
+
         // 1. Calculate the current difficulty variables based on the current level
         float currentShakeDur = Mathf.Max(minShakeDuration, baseShakeDuration - (currentDifficulty * shakeDurationDecreasePerLevel));
         float currentShakeAmt = baseShakeAmount + (currentDifficulty * shakeAmountIncreasePerLevel);
@@ -129,7 +140,12 @@ public class WindChimingGameManager : MonoBehaviour
                 leaf.TriggerShake(currentShakeDur, currentShakeAmt, currentCollapseDur);
             }
         }
-        yield return null;
+
+        // 4. NEW: Wait for the entire shake and collapse animation to finish
+        yield return new WaitForSeconds(currentShakeDur + currentCollapseDur);
+
+        // Unlock the cycle to allow the beatTimer to start counting for the next stage
+        isBeatCycleActive = false;
     }
 
     IEnumerator UmbraInterference()
@@ -173,6 +189,7 @@ public class WindChimingGameManager : MonoBehaviour
         if (umbraTriggered) StartCoroutine(UmbraInterference());
 
         beatTimer = 0f;
+        isBeatCycleActive = false; // Reset the lock on death so the cycle can start again
 
         yield return null; 
         gameRunning = true;
