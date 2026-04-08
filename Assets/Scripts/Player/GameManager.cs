@@ -27,7 +27,7 @@ public class GameManager : MonoBehaviour
         CheckAllConditions();
     }
 
-    public void SetGoldenGiner(bool value) {
+    public void SetGoldenGinger(bool value) {
         hasGoldenGinger = value;
         CheckAllConditions();
     }

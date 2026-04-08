@@ -159,7 +159,7 @@ public class TallGrassGameManager : MonoBehaviour
         foreach (var bird in shadowBirds)
             if (bird != null) bird.Deactivate();
 
-        globalGameManager?.SetGoldenGiner(true); // Note: typo matches GameManager.cs intentionally
+        globalGameManager?.SetGoldenGinger(true);
         onWin?.Invoke();
     }
 

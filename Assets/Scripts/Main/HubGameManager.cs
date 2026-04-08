@@ -79,12 +79,7 @@ public class HubGameManager : MonoBehaviour
     /// </summary>
     public void LoadScene(string sceneName)
     {
-        if (string.IsNullOrEmpty(sceneName))
-        {
-            Debug.LogWarning("HubGameManager: Tried to load a scene with no name.");
-            return;
-        }
-
-        SceneManager.LoadScene(sceneName);
+        if (string.IsNullOrEmpty(sceneName)) return;
+        SceneTransitionManager.Instance.LoadScene(sceneName);
     }
 }
