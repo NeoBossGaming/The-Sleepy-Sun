@@ -41,4 +41,10 @@ public class GameManager : MonoBehaviour
         return hasAllWinConditions;
     }
 
+    // Read-only accessors used by VillageNoticeboard to display ingredient progress
+    public bool HasSilverLeaf  => hasSilverLeaf;
+    public bool HasCaveNectar  => hasCaveNectar;
+    public bool HasStardustFish => hasStardustFish;
+    public bool HasGoldenGinger => hasGoldenGinger;
+
 }
