@@ -59,7 +59,7 @@ public class HubPathPortal : MonoBehaviour, IHubInteractable
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-
+        Interact();
         HubPlayerController player = other.GetComponent<HubPlayerController>();
         if (player != null) player.SetInteractable(this);
 
