@@ -23,6 +23,9 @@ public class HubGameManager : MonoBehaviour
     [SerializeField] private HubPathPortal tallGrassPortal;
     [SerializeField] private HubPathPortal grandTeapotPortal; // Locked until all ingredients gathered
 
+    [Header("References")]
+    [SerializeField] private SceneTransitionManager sceneTransitionManager;
+
     [Header("Feedback")]
     [SerializeField] private GameObject teapotLockedUI; // Optional: "You need all ingredients" message
 
@@ -80,6 +83,7 @@ public class HubGameManager : MonoBehaviour
     public void LoadScene(string sceneName)
     {
         if (string.IsNullOrEmpty(sceneName)) return;
-        SceneTransitionManager.Instance.LoadScene(sceneName);
+        Debug.Log($"HubGameManager: Loading scene '{sceneName}'...");
+        sceneTransitionManager.LoadScene(sceneName);
     }
 }

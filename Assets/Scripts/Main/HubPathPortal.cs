@@ -59,10 +59,11 @@ public class HubPathPortal : MonoBehaviour, IHubInteractable
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        Interact();
+        
         HubPlayerController player = other.GetComponent<HubPlayerController>();
         if (player != null) player.SetInteractable(this);
-
+        Debug.Log($"Player entered {gameObject.name} trigger. Portal is {(isLocked ? "locked" : "unlocked")}.");
+        Interact();
         ShowPrompt();
     }
 
