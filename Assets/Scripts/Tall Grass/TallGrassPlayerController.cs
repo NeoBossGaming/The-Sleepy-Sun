@@ -11,8 +11,9 @@ using UnityEngine;
 /// DESIGN: This script does not handle capture logic.
 /// It only manages its own stealth state and notifies nothing.
 /// The TallGrassShadowBird reads IsHidden and notifies the Manager.
+///
+/// NOTE: Expects a child GameObject named "PlayerGraphics" with a SpriteRenderer.
 /// </summary>
-[RequireComponent(typeof(SpriteRenderer))]
 public class TallGrassPlayerController : PlayerMovement
 {
     // --- State ---
@@ -35,7 +36,7 @@ public class TallGrassPlayerController : PlayerMovement
     protected override void Start()
     {
         base.Start();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     // -------------------------------------------------------------------------

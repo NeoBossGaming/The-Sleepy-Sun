@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(PlayerInput))]
-[RequireComponent(typeof(Animator))]
 
 public class PlayerAnimation : MonoBehaviour
 {
@@ -20,7 +19,7 @@ public class PlayerAnimation : MonoBehaviour
 
     void Start() {
         playerInputScript = GetComponent<PlayerInput>();
-        playerAnimator = GetComponent<Animator>();
+        playerAnimator = GetComponentInChildren<Animator>();
         StartCoroutine(UpdateAnimationState());
     }
 
@@ -30,7 +29,7 @@ public class PlayerAnimation : MonoBehaviour
     /// </summary>
     IEnumerator UpdateAnimationState()
     {
-        while (runAnimation) 
+        while (runAnimation)
         {
             Vector2 moveValue = playerInputScript.obtainMoveInputActions().move;
             // 1. Check Vertical Up
